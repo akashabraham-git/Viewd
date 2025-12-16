@@ -1,0 +1,25 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  title: MyString
+  tmdb_id: 1
+  release_date: 2025-12-16
+  poster_url: MyString
+  language: 1
+  runtime: 1
+  trailer: MyString
+  synopsis: MyText
+  origin_country: 1
+  status: 1
+
+two:
+  title: MyString
+  tmdb_id: 1
+  release_date: 2025-12-16
+  poster_url: MyString
+  language: 1
+  runtime: 1
+  trailer: MyString
+  synopsis: MyText
+  origin_country: 1
+  status: 1

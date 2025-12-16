@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  content: MyText
+  watched_on: 2025-12-16
+  is_rewatch: false
+  contains_spoilers: false
+  user: one
+  movie: one
+
+two:
+  content: MyText
+  watched_on: 2025-12-16
+  is_rewatch: false
+  contains_spoilers: false
+  user: two
+  movie: two

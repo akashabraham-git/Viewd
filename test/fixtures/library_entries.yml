@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  movie: one
+  user: one
+  watched: false
+  date: 2025-12-16
+
+two:
+  movie: two
+  user: two
+  watched: false
+  date: 2025-12-16

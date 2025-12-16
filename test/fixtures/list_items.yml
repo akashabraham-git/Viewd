@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  list: one
+  movie: one
+  rank: 1
+
+two:
+  list: two
+  movie: two
+  rank: 1
