@@ -6,22 +6,22 @@ class User < ApplicationRecord
   has_many :library_entries, dependent: :destroy
   has_many :likes, dependent: :destroy
   has_one :membership, dependent: :destroy
-  has_one :membership_tier, through :membership
+  has_one :membership_tier, through: :membership
   has_many :lists, dependent: :destroy
-  has_many :list_items, through :lists, dependent: :destroy
+  has_many :list_items, through: :lists, dependent: :destroy
   has_many :ratings, dependent: :destroy
   has_many :reviews, dependent: :destroy
 
-  validates :username, presence: true, uniqueness: true, length: {minimum: 3, maximum: 20}, format{with: /\A[a-zA-Z0-9_.]+\z/}
+  validates :username, presence: true, uniqueness: true, length: {minimum: 3, maximum: 20}, format: {with: /\A[a-zA-Z0-9_.]+\z/}
   validates :email, presence: true, uniqueness: true, format: {with: URI::MailTo::EMAIL_REGEXP}
-  validates :name, format{with: /\A[a-zA-Z\s]+\z/}, length: {minimum: 2, maximum: 30}
+  validates :name, format: {with: /\A[a-zA-Z\s]+\z/}, length: {minimum: 2, maximum: 30}
 
   before_validation :normalize_username, :normalize_email
   before_create :normalize_name
   after_create :create_default_membership
   after_commit :send_welcome_email
 
-  enum country: { 
+  enum :country, { 
     unknown: 0, 
     usa: 1, 
     india: 2, 

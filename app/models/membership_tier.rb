@@ -1,8 +1,8 @@
 class MembershipTier < ApplicationRecord
   has_many :memberships
-  has_many :users through :memberships
+  has_many :users, through: :memberships
 
-  enum country: { 
+  enum :country, { 
     unknown: 0, 
     usa: 1, 
     india: 2, 
@@ -15,7 +15,7 @@ class MembershipTier < ApplicationRecord
     brazil: 9 
   }
 
-  enum badge: {
+  enum :badge, {
     gold: 0,
     diamond: 1
   }

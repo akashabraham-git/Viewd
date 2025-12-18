@@ -1,0 +1,33 @@
+<div style="width: 100%; display: flex; flex-direction: column;">
+  <div class="navbar" style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0 20px;">
+    <h1>VIEWD</h1>
+    
+    <%= form_with url: movies_path, method: :get, local: true, style: "margin: 0;" do |f| %>
+      <%= f.text_field :query, value: params[:query], placeholder: "Search movies..." %>
+      <%= f.submit "Search" %>
+    <% end %>
+  </div>
+  
+
+  <div style = "display: flex; flex-direction: row; padding: 0px 30px">
+    <div style = "display: flex; flex-direction: column;">
+      <%=image_tag @movie.poster_url, alt: @movie.title, style: "width: 100%; height: 350px; object-fit: cover;"%>
+      <p>total watch count: <%=@total_watch%></p>
+      <p>total likes: <%=@total_likes%></p>
+
+    </div>
+
+    <div style="display: flex; flex-direction: column;">
+      <h1><%=@movie.title%></h1>
+      <p style="color: gray"><%=@movie.release_date%></p>
+      <br />
+      <p><%=@movie.synopsis%></p>
+    </div>
+
+    <div style="display: flex; flex-direction: column;">
+      <%= render 'ratings/form', movie: @movie %>
+    </div>
+
+  </div>
+</div>
+

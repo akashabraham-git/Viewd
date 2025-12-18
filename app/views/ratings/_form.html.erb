@@ -1,0 +1,25 @@
+<% user = User.first %>
+<% @current_rating = user.ratings.find_by(movie: movie)&.rating if user %>
+
+<div class="star-rating">
+  <%= form_with url: movie_ratings_path(movie), method: :post, local: true do |f| %>
+    <% 1.upto(5) do |i| %>
+      <input type="radio" id="star<%= i %>" name="score" value="<%= i %>" 
+             onchange="this.form.submit()" 
+             <%= "checked" if @current_rating == i %> />
+      <label for="star<%= i %>">★</label>
+    <% end %>
+  <% end %>
+  <span class="rating-label">Rate this movie</span>
+</div>
+
+<style>
+  .star-rating { display: flex; flex-direction: row-reverse; justify-content: flex-end; align-items: center; }
+  .star-rating input { display: none; }
+  .star-rating label { font-size: 35px; color: #ddd; cursor: pointer; transition: 0.2s; }
+  .star-rating .rating-label { margin-left: 15px; font-family: sans-serif; color: #666; }
+  
+  .star-rating input:checked ~ label,
+  .star-rating label:hover,
+  .star-rating label:hover ~ label { color: #f5b301; }
+</style>
