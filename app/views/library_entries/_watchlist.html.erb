@@ -1,0 +1,6 @@
+<% entry = LibraryEntry.find_by(user: User.first, movie: @movie) %>
+<%= button_to movie_toggle_watchlist_path(@movie), 
+                method: :post, 
+                class: "btn #{entry&.watchlist ? 'btn-success' : 'btn-outline-secondary'}" do %>
+    <%= entry&.watchlist ? "✓ In Watchlist" : "+ Add to Watchlist" %>
+  <% end %>

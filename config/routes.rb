@@ -10,9 +10,12 @@ Rails.application.routes.draw do
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
-  
+
   resources :movies, only: [:index, :show] do
     post 'ratings', to: 'ratings#create_or_update'
+    post 'toggle_watched', to: 'library_entries#toggle_watched'
+    post 'toggle_watchlist', to: 'library_entries#toggle_watchlist'
+    post 'toggle_movie_like', to: 'likes#toggle_movie_like'
     resources :reviews, only: [:create]
   end
 

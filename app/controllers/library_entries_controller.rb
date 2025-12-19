@@ -1,0 +1,37 @@
+class LibraryEntriesController < ApplicationController
+  before_action :set_movie, :set_user
+
+  def toggle_watched
+    entry = LibraryEntry.find_or_initialize_by(user: @user, movie: @movie)
+    entry.watched = !entry.watched
+    if entry.watched
+      entry.date = Date.today
+    else
+      like = Like.find_by(likeable: @movie, user: @user) 
+      like.destroy if like
+    end
+    entry.save
+    redirect_back fallback_location: movie_path(@movie)
+  end
+
+  def toggle_watchlist
+    entry = LibraryEntry.find_or_initialize_by(user: @user, movie: @movie)
+    entry.watchlist = !entry.watchlist
+    entry.save
+    redirect_back fallback_location: movie_path(@movie)
+  end
+
+  private
+
+  def set_movie
+    @movie = Movie.find_by(id: params[:movie_id])
+    if @movie.nil?
+      redirect_to movies_path, alert: "Error: Movie not found."
+    end
+  end
+
+  def set_user
+    @user = User.first
+  end
+
+end

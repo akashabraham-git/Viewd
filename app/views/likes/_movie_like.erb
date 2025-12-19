@@ -1,0 +1,5 @@
+
+<%like = Like.find_by(likeable: @movie, user: User.first)%>
+<%=button_to  movie_toggle_movie_like_path(@movie), method: :post, data: { turbo: false } do%>
+  <%= like ? "Liked" : "Like"%>
+<% end %>

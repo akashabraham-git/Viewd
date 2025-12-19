@@ -2,7 +2,7 @@
   <div class="navbar" style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0 20px;">
     <h1>VIEWD</h1>
     
-    <%= form_with url: movies_path, method: :get, local: true, style: "margin: 0;" do |f| %>
+    <%= form_with url: movies_path, method: :get do |f| %>
       <%= f.text_field :query, value: params[:query], placeholder: "Search movies..." %>
       <%= f.submit "Search" %>
     <% end %>

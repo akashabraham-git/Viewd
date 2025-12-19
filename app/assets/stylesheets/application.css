@@ -13,3 +13,26 @@
  *= require_tree .
  *= require_self
  */
+.movie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 25px;
+}
+.movie-card .poster {
+  width: 100%;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+.movie-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+.header-section {
+  display: flex;
+  gap: 40px;
+}
+.main-poster {
+  width: 300px;
+  border-radius: 15px;
+}
