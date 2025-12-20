@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_12_19_060325) do
+ActiveRecord::Schema[7.2].define(version: 2025_12_19_171344) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -38,6 +38,16 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_19_060325) do
     t.datetime "updated_at", null: false
     t.index ["cast_id"], name: "index_credits_on_cast_id"
     t.index ["movie_id"], name: "index_credits_on_movie_id"
+  end
+
+  create_table "favorites", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "movie_id", null: false
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["movie_id"], name: "index_favorites_on_movie_id"
+    t.index ["user_id"], name: "index_favorites_on_user_id"
   end
 
   create_table "genres", force: :cascade do |t|
@@ -171,6 +181,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_19_060325) do
   add_foreign_key "connections", "users", column: "following_id"
   add_foreign_key "credits", "casts"
   add_foreign_key "credits", "movies"
+  add_foreign_key "favorites", "movies"
+  add_foreign_key "favorites", "users"
   add_foreign_key "library_entries", "movies"
   add_foreign_key "library_entries", "users"
   add_foreign_key "likes", "users"

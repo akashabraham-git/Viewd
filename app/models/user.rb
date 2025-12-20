@@ -11,6 +11,8 @@ class User < ApplicationRecord
   has_many :list_items, through: :lists, dependent: :destroy
   has_many :ratings, dependent: :destroy
   has_many :reviews, dependent: :destroy
+  has_many :favorites, -> { order(position: :asc) }, dependent: :destroy
+  has_many :favorite_movies, through: :favorites, source: :movie
 
   validates :username, presence: true, uniqueness: true, length: {minimum: 3, maximum: 20}, format: {with: /\A[a-zA-Z0-9_.]+\z/}
   validates :email, presence: true, uniqueness: true, format: {with: URI::MailTo::EMAIL_REGEXP}
@@ -56,6 +58,10 @@ class User < ApplicationRecord
 
   def send_welcome_email
     puts "Welcome mail sent to #{email}"
+  end
+
+  def following?(other_user)
+    following.include?(other_user)
   end
 
 end

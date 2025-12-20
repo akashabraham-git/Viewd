@@ -1,10 +1,144 @@
-<p style="color: green"><%= notice %></p>
+<div style="max-width: 1000px; margin: 0 auto; padding: 20px; color: #9ab;">
+  
+  <%# PROFILE HEADER %>
+  <div style="display: flex; justify-content: space-between; margin: 40px 0;">
+    <div style="display: flex; gap: 20px; align-items: center;">
+      <div style="width: 80px; height: 80px; background: #2c3440; border-radius: 50%; border: 2px solid #fff;"></div>
+      <div>
+        <h1 style="color: #fff; margin: 0;"><%= @user.name %></h1>
+        <p style="font-size: 0.9rem; color: #678;">Kochi, India</p>
+      </div>
+    </div>
+    <div style="display: flex; gap: 30px; text-align: center; color: #fff;">
+      <div><strong><%= @films_count %></strong><br><small style="color: #9ab;">FILMS</small></div>
+      <div><strong><%= @this_year_count %></strong><br><small style="color: #9ab;">THIS YEAR</small></div>
+      
+      <%# Following Link %>
+      <%= link_to connections_path(user_id: @user.id, type: 'following'), style: "text-decoration: none; color: inherit;" do %>
+        <div><strong><%= @user.following.count %></strong><br><small style="color: #9ab;">FOLLOWING</small></div>
+      <% end %>
+      
+      <%# Followers Link %>
+      <%= link_to connections_path(user_id: @user.id, type: 'followers'), style: "text-decoration: none; color: inherit;" do %>
+        <div><strong><%= @user.followers.count %></strong><br><small style="color: #9ab;">FOLLOWERS</small></div>
+      <% end %>
+    </div>
 
-<%= render @user %>
+    <div style="margin-top: 10px;">
+      <% unless @user == User.first %>
+        <% if User.first.following?(@user) %>
+          <%= button_to "Unfollow", connection_path(@user), method: :delete, class: "btn-unfollow" %>
+        <% else %>
+          <%# Updated param to following_id %>
+          <%= button_to "Follow", connections_path(following_id: @user.id), method: :post, class: "btn-follow" %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
 
-<div>
-  <%= link_to "Edit this user", edit_user_path(@user) %> |
-  <%= link_to "Back to users", users_path %>
-
-  <%= button_to "Destroy this user", @user, method: :delete %>
+  <%# PROFILE SPECIFIC NAVBAR %>
+  <div style="display: flex; gap: 25px; border-bottom: 1px solid #2c3440; margin-bottom: 30px; padding-bottom: 10px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase;">
+  <%= link_to "Profile", user_path(@user), style: "text-decoration: none; color: #fff;" %>
+  <%= link_to "Films", library_user_path(@user), style: "text-decoration: none; color: #9ab;" %>
+  <%= link_to "Watchlist", watchlist_user_path(@user), style: "text-decoration: none; color: #9ab;" %>
 </div>
+
+  <div style="display: flex; gap: 40px;">
+    <%# --- LEFT SIDE: FAVORITES --- %>
+    <div style="flex: 2;">
+      <div style="border-bottom: 1px solid #456; margin-bottom: 15px; display: flex; justify-content: space-between; padding-bottom: 5px;">
+        <h4 style="color: #fff; font-size: 0.7rem; margin: 0;">FAVORITE FILMS</h4>
+        <%= link_to (@edit_mode ? "DONE" : "EDIT"), user_path(@user, edit_favorites: !@edit_mode), style: "color: #00e054; text-decoration: none; font-size: 0.7rem; font-weight: bold;" %>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 40px;">
+        <% 4.times do |i| %>
+          <% movie = @favorites[i] %>
+          <div style="aspect-ratio: 2/3; background: #1a2129; border: 1px solid #2c3440; border-radius: 4px; position: relative; display: flex; align-items: center; justify-content: center;">
+            <% if movie %>
+              <%= image_tag movie.poster_url, style: "width: 100%; height: 100%; object-fit: cover;" %>
+              <% if @edit_mode %>
+                <%= button_to "✕", favorite_path(movie), method: :delete, style: "position: absolute; top: -10px; right: -10px; background: #ff4b4b; color: white; border: none; border-radius: 50%; width: 22px; height: 22px; cursor: pointer; z-index: 20;" %>
+              <% end %>
+            <% elsif @edit_mode %>
+              <button onclick="openModal()" style="position: absolute; inset: 0; background: transparent; color: #456; border: 2px dashed #456; font-size: 3rem; cursor: pointer; z-index: 10;">+</button>
+            <% else %>
+              <span style="color: #232a33; font-size: 2.5rem;">+</span>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <h4 style="border-bottom: 1px solid #456; color: #fff; font-size: 0.7rem; padding-bottom: 5px; margin-bottom: 15px;">RECENT ACTIVITY</h4>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+        <% @recent_activity.each do |entry| %>
+          <%= image_tag entry.movie.poster_url, style: "width: 100%; border-radius: 3px; border: 1px solid #2c3440;" %>
+        <% end %>
+      </div>
+
+      <%# Inside app/views/users/show.html.erb %>
+      <div style="margin-top: 40px; border-top: 1px solid #2c3440; padding-top: 20px;">
+        <h4 style="color: #fff; font-size: 0.7rem; letter-spacing: 1px; margin-bottom: 20px;">YOUR REVIEWS</h4>
+        
+        <% @user.reviews.each do |review| %>
+          <div style="background: #1a2129; padding: 15px; border-radius: 4px; margin-bottom: 15px; border: 1px solid #2c3440;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <div style="display: flex; gap: 15px;">
+                <%= image_tag review.movie.poster_url, style: "width: 40px; border-radius: 2px;" %>
+                <div>
+                  <h5 style="color: #fff; margin: 0; font-size: 0.9rem;"><%= review.movie.title %></h5>
+                  <p style="color: #9ab; font-size: 0.85rem; margin: 5px 0;"><%= review.content %></p>
+                </div>
+              </div>
+              
+              <%# Management Links %>
+              <div style="display: flex; gap: 10px;">
+                <%= link_to "EDIT", edit_review_path(review), 
+                    style: "color: #9ab; text-decoration: none; font-size: 0.7rem; font-weight: bold; border: 1px solid #456; padding: 3px 8px; border-radius: 3px;" %>
+                
+                <%= button_to "DELETE", review_path(review), method: :delete, 
+                    data: { confirm: "Are you sure?" },
+                    style: "background: transparent; color: #ff4b4b; border: 1px solid #ff4b4b; font-size: 0.7rem; font-weight: bold; padding: 3px 8px; border-radius: 3px; cursor: pointer;" %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# --- RIGHT SIDE: WATCHLIST --- %>
+    <div style="flex: 1;">
+      <h4 style="border-bottom: 1px solid #456; color: #fff; font-size: 0.7rem; padding-bottom: 5px; margin-bottom: 15px;">WATCHLIST</h4>
+      <div style="display: flex; position: relative; height: 120px; margin-left: 10px;">
+        <% @watchlist.each_with_index do |entry, i| %>
+          <%= image_tag entry.movie.poster_url, 
+              style: "width: 80px; height: 110px; border: 1px solid #000; position: absolute; left: #{i * 22}px; z-index: #{10-i}; box-shadow: -2px 0 5px rgba(0,0,0,0.5); border-radius: 3px;" %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%# --- SEARCH MODAL WITH DROPDOWN --- %>
+<div id="favModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center;">
+  <div style="background: #2c3440; padding: 25px; border-radius: 8px; width: 350px; position: relative;">
+    <button onclick="closeModal()" style="position: absolute; top: 10px; right: 10px; background: transparent; color: #9ab; border: none; font-size: 1.5rem; cursor: pointer;">✕</button>
+    <h3 style="color: #fff; margin-top: 0;">Add a Favorite</h3>
+    
+    <%= form_with url: favorites_path, method: :post do |f| %>
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; color: #9ab; margin-bottom: 5px; font-size: 0.8rem;">CHOOSE FROM ALL MOVIES</label>
+        <%= f.collection_select :movie_id, @all_movies, :id, :title, 
+            { prompt: "Search movies..." }, 
+            { style: "width: 100%; padding: 10px; background: #14181c; color: white; border: 1px solid #456; border-radius: 4px;" } %>
+      </div>
+      <%= f.submit "ADD TO FAVORITES", style: "width: 100%; padding: 10px; background: #00e054; border: none; color: #000; font-weight: bold; border-radius: 4px; cursor: pointer;" %>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  function openModal() { document.getElementById('favModal').style.display = 'flex'; }
+  function closeModal() { document.getElementById('favModal').style.display = 'none'; }
+  window.onclick = (e) => { if (e.target == document.getElementById('favModal')) closeModal(); }
+</script>

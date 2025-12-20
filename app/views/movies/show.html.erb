@@ -1,38 +1,78 @@
-<div style="width: 100%; display: flex; flex-direction: column;">
-  <div class="navbar" style="display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0 20px;">
-    <h1>VIEWD</h1>
+<div style="width: 100%; display: flex; flex-direction: column; color: #9ab; background-color: #14181c; min-height: 100vh;">
+  <div style="display: flex; flex-direction: row; padding: 40px 10%; width: 100%; gap: 40px;">
     
-    <%= form_with url: movies_path, method: :get do |f| %>
-      <%= f.text_field :query, value: params[:query], placeholder: "Search movies..." %>
-      <%= f.submit "Search" %>
-    <% end %>
-  </div>
-  
-
-  <div style = "display: flex; flex-direction: row; padding: 0px 30px; width: 100%">
-    <div style = "display: flex; flex-direction: column; width: 30%">
-      <%=image_tag @movie.poster_url, alt: @movie.title%>
-      <p>total watch count: <%=@total_watch%></p>
-      <p>total likes: <%=@total_likes%></p>
-
+    <%# Left Column: Poster & Stats %>
+    <div style="display: flex; flex-direction: column; width: 250px; flex-shrink: 0;">
+      <%= image_tag @movie.poster_url, alt: @movie.title, style: "width: 100%; border-radius: 4px; border: 1px solid #456;" %>
+      <div style="margin-top: 15px; font-size: 0.8rem; text-align: center; display: flex; justify-content: space-around;">
+        <span>👁️ <%= @total_watch %></span>
+        <span>❤️ <%= @total_likes %></span>
+        <span>⭐ <%= @movie.average_rating %></span>
+      </div>
     </div>
 
-    <div style="display: flex; flex-direction: column;">
-      <h1><%=@movie.title%></h1>
-      <p style="color: gray"><%=@movie.release_date%></p>
-      <br />
-      <p><%=@movie.synopsis%></p>
+    <%# Center Column: Info, Cast, and Reviews %>
+    <div style="display: flex; flex-direction: column; flex: 1;">
+      <h1 style="color: #fff; margin: 0; font-size: 2.5rem;"><%= @movie.title %></h1>
+      <p style="color: #678; font-weight: bold;"><%= @movie.release_date.year if @movie.release_date %></p>
+      <p style="line-height: 1.5; margin: 20px 0;"><%= @movie.synopsis %></p>
+
+      <hr style="border: 0; border-top: 1px solid #2c3440; margin: 30px 0;">
+
+      <%# 1. Render the Cast Grid %>
+      <h4 style="color: #fff; border-bottom: 1px solid #456; padding-bottom: 5px; font-size: 0.8rem;">CAST</h4>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+        <% @credits.each do |credit| %>
+          <%= link_to cast_path(credit.cast), style: "text-decoration: none; color: #fff; font-size: 0.8rem;" do %>
+            <div style="background: #1a2129; padding: 5px; border-radius: 3px; border: 1px solid #2c3440;">
+              <%= credit.cast.name %> 
+              <small style="color: #678; display: block;">as <%= credit.role %></small>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+
+      <%# 2. Render the Review Form Partial %>
+      <div style="margin-top: 40px;">
+        <%= render 'reviews/form', movie: @movie %>
+      </div>
+
+      <%# --- POPULAR REVIEWS SECTION --- %>
+      <div style="margin-top: 40px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #456; padding-bottom: 5px;">
+          <h4 style="color: #fff; font-size: 0.8rem; margin: 0;">POPULAR REVIEWS</h4>
+          <%= link_to "ALL REVIEWS", movie_reviews_path(@movie), style: "font-size: 0.7rem; color: #00e054; text-decoration: none; font-weight: bold;" %>
+        </div>
+
+        <% @popular_reviews.each do |review| %>
+          <div style="display: flex; gap: 15px; margin-top: 20px; border-bottom: 1px solid #232a33; padding-bottom: 15px;">
+            <div style="width: 40px; height: 40px; background: #2c3440; border-radius: 50%; overflow: hidden; flex-shrink: 0;">
+            </div>
+            <div>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <%= link_to review.user.name, user_path(review.user), style: "color: #fff; text-decoration: none; font-weight: bold; font-size: 0.9rem;" %>
+                \
+                <% user_rating = Rating.find_by(user: review.user, movie: @movie) %>
+                <% if user_rating %>
+                  <span style="color: #00e054; font-size: 0.8rem;">★ <%= user_rating.rating %></span>
+                <% end %>
+              </div>
+              <p style="font-size: 0.9rem; margin-top: 5px; color: #9ab;"><%= review.content %></p>
+            </div>
+          </div>
+        <% end %>
+      </div>
     </div>
 
-    <div style="display: flex; flex-direction: column;">
-      <div style="border-left: 1px solid #ddd; padding-left: 15px; margin-left: 5px;">
+    <%# Right Column: Actions (Rating/Watchlist) %>
+    <div style="width: 230px; display: flex; flex-direction: column; gap: 10px; background: #1a2129; padding: 15px; border-radius: 4px; height: fit-content;">
+      <div style="border-bottom: 1px solid #2c3440; padding-bottom: 10px; margin-bottom: 10px;">
+        <label style="font-size: 0.7rem; color: #678;">YOUR RATING</label>
         <%= render 'ratings/form', movie: @movie %>
       </div>
-      <%= render 'library_entries/watched', movie: @movie%>
-      <%= render 'library_entries/watchlist', movie: @movie%>
-      <%= render 'likes/movie_like', movie: @movie%>
+      <%= render 'library_entries/watched', movie: @movie %>
+      <%= render 'library_entries/watchlist', movie: @movie %>
+      <%= render 'likes/movie_like', movie: @movie %>
     </div>
-
   </div>
 </div>
-

@@ -12,15 +12,21 @@ Rails.application.routes.draw do
 
 
   resources :movies, only: [:index, :show] do
-    post 'ratings', to: 'ratings#create_or_update'
     post 'toggle_watched', to: 'library_entries#toggle_watched'
     post 'toggle_watchlist', to: 'library_entries#toggle_watchlist'
     post 'toggle_movie_like', to: 'likes#toggle_movie_like'
-    resources :reviews, only: [:create]
+    resources :reviews, only: [:create, :index]
+    resources :ratings, only: [:create]
   end
 
+  get 'users/:id/library', to: 'users#library', as: :library_user
+  get 'users/:id/watchlist', to: 'users#watchlist', as: :watchlist_user
+
   resources :users, only: [:show]
-  resources :follows, only: [:create]
+  resources :favorites, only: [:create, :destroy]
+  resources :connections, only: [:index, :create, :destroy]
+  resources :cast, only: [:show]
+  resources :reviews, only: [:create, :edit, :destroy]
   
   root "movies#index"
 end

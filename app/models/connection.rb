@@ -9,4 +9,5 @@ class Connection < ApplicationRecord
       errors.add(:follower_id, "you cannot follow yourself")
     end
   end
+  
 end

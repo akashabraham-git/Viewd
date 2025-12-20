@@ -1,0 +1,14 @@
+<div style="background: #1a2129; padding: 20px; border-radius: 4px; border: 1px solid #2c3440;">
+  <h4 style="color: #fff; margin-top: 0; font-size: 0.9rem; letter-spacing: 1px;">ADD A REVIEW</h4>
+  
+  <%= form_with(model: [movie, Review.new], local: true) do |f| %>
+    <%= f.text_area :content, 
+        placeholder: "Write your thoughts on #{movie.title}...", 
+        style: "width: 100%; background: #14181c; border: 1px solid #456; color: white; padding: 12px; border-radius: 4px; height: 100px; font-family: inherit; box-sizing: border-box; outline: none;" %>
+    
+    <div style="display: flex; justify-content: flex-end; margin-top: 10px;">
+      <%= f.submit "POST REVIEW", 
+          style: "background: #00e054; color: #000; border: none; padding: 8px 20px; border-radius: 3px; font-weight: bold; cursor: pointer; font-size: 0.75rem;" %>
+    </div>
+  <% end %>
+</div>
