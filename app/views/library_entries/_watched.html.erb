@@ -1,12 +1,12 @@
-<% entry = LibraryEntry.find_by(user: User.first, movie: @movie) %>
+<% entry = LibraryEntry.find_by(user: @user, movie: @movie) %>
+<% watched = entry&.watched_date.present? %>
+
 <%= button_to movie_toggle_watched_path(@movie), 
                 method: :post, 
                 class: "btn #{entry&.watched ? 'btn-info' : 'btn-outline-primary'}" do %>
-    <%= entry&.watched ? "★ Watched" : "Mark as Watched" %>
+    <%= watched ? "★ Watched" : "Mark as Watched" %>
   <% end %>
 
-
-<% watched = @entry&.watched %>
 
 
 

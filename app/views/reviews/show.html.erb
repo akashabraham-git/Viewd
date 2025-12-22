@@ -1,0 +1,151 @@
+<div style="max-width: 800px; margin: 0 auto; padding: 40px 20px; color: #9ab;">
+
+  <%# MOVIE HEADER %>
+  <div style="display: flex; gap: 30px; margin-bottom: 40px;">
+
+    <%# POSTER %>
+    <div style="width: 180px; flex-shrink: 0;">
+      <%= link_to movie_path(@review.movie) do %>
+        <div style="aspect-ratio:2/3;
+                    background:#1a2129;
+                    border:1px solid #2c3440;
+                    border-radius:6px;
+                    overflow:hidden;">
+          <%= image_tag @review.movie.poster_url,
+              style:"width:100%;height:100%;object-fit:cover;" %>
+        </div>
+      <% end %>
+
+    </div>
+
+    <%# REVIEW CONTENT %>
+    <div style="flex: 1;">
+
+      <%# MOVIE TITLE %>
+      <h2 style="color:#fff;margin:0 0 10px 0;">
+        <%= @review.movie.title %>
+      </h2>
+
+      <%# USER ROW %>
+      <%= link_to user_path(@review.user), style:"text-decoration:none;display:flex;gap:12px;align-items:center;" do %>
+
+        <div style="display:flex;
+                    align-items:center;
+                    gap:12px;
+                    margin-bottom:15px;">
+
+          <%# AVATAR %>
+          <div style="width:36px;height:36px;
+                      border-radius:50%;
+                      overflow:hidden;
+                      background:#2c3440;">
+            <% if @review.user.profile_picture.attached? %>
+              <%= image_tag @review.user.profile_picture,
+                  style:"width:100%;height:100%;object-fit:cover;" %>
+            <% else %>
+              <div style="width:100%;height:100%;
+                          display:flex;
+                          align-items:center;
+                          justify-content:center;
+                          color:#456;">
+                👤
+              </div>
+            <% end %>
+          </div>
+
+          <%# USERNAME + RATING %>
+          <div>
+            <p style="margin:0;
+                      color:#fff;
+                      font-size:0.8rem;">
+              <%= @review.user.name %>
+            </p>
+            
+            <p style="margin:2px 0 0 0;
+                      color:#ffd700;
+                      font-size:0.7rem;">
+              <%= @rating %> ★
+            </p>
+          </div>
+        </div>
+      <%end%>
+
+      <%# REVIEW BODY %>
+      <p style="color:#9ab;
+                font-size:0.9rem;
+                line-height:1.6;
+                margin-bottom:20px;">
+        <%= @review.content %>
+      </p>
+
+      <%# META ROW %>
+      <div style="display:flex;
+                  justify-content:space-between;
+                  align-items:center;
+                  border-top:1px solid #2c3440;
+                  padding-top:12px;">
+
+      <div style="text-align: right;">
+
+        <small style="display: block;
+                      color: #456;
+                      margin-bottom: 5px;">
+          <%= @review.created_at.strftime("%b %d, %Y") %>
+        </small>
+
+        <%= button_to toggle_like_movie_review_path(@review.movie, @review),
+              method: :post,
+              style: "background:none;
+                      border:none;
+                      cursor:pointer;
+                      padding:0;
+                      display:inline-flex;
+                      align-items:center;
+                      gap:5px;" do %>
+
+          <span style="color:<%= @review.likes.exists?(user: @current_user) ? '#ff4b4b' : '#678' %>;
+                      font-size:1rem;">
+            <%= @review.likes.exists?(user: @current_user) ? '❤' : '♡' %>
+          </span>
+
+          <span style="color:#678;
+                      font-size:0.8rem;
+                      font-weight:bold;">
+            <%= @review.likes.count %>
+          </span>
+
+        <% end %>
+      </div>
+
+
+        <%# ACTIONS (ONLY OWNER) %>
+        <% if @review.user == @current_user %>
+          <div style="display:flex;gap:10px;">
+            <%= link_to "EDIT",
+                edit_movie_review_path(@review.movie, @review),
+                style:"color:#9ab;
+                       text-decoration:none;
+                       font-size:0.65rem;
+                       border:1px solid #456;
+                       padding:3px 8px;
+                       border-radius:3px;" %>
+
+            <%= button_to "DELETE",
+                movie_review_path(@review.movie, @review),
+                method: :delete,
+                data: { confirm: "Delete this review?" },
+                style:"background:transparent;
+                       color:#ff4b4b;
+                       border:1px solid #ff4b4b;
+                       font-size:0.65rem;
+                       padding:3px 8px;
+                       border-radius:3px;
+                       cursor:pointer;" %>
+          </div>
+        <% end %>
+
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,63 +1,156 @@
-<div style="width: 100%; display: flex; flex-direction: column; color: #9ab; background-color: #14181c; min-height: 100vh;">
+<div style="width: 100%; display: flex; flex-direction: column; color: #9ab; background-color: #14181c; min-height: 100vh; font-family: sans-serif;">
   <div style="display: flex; flex-direction: row; padding: 40px 10%; width: 100%; gap: 40px;">
     
     <%# Left Column: Poster & Stats %>
     <div style="display: flex; flex-direction: column; width: 250px; flex-shrink: 0;">
       <%= image_tag @movie.poster_url, alt: @movie.title, style: "width: 100%; border-radius: 4px; border: 1px solid #456;" %>
-      <div style="margin-top: 15px; font-size: 0.8rem; text-align: center; display: flex; justify-content: space-around;">
+      <div style="margin-top: 15px; font-size: 0.8rem; text-align: center; display: flex; justify-content: space-around; border-bottom: 1px solid #2c3440; padding-bottom: 15px;">
         <span>👁️ <%= @total_watch %></span>
         <span>❤️ <%= @total_likes %></span>
         <span>⭐ <%= @movie.average_rating %></span>
       </div>
     </div>
 
-    <%# Center Column: Info, Cast, and Reviews %>
+    <%# Center Column: Info, Tabs (Cast/Crew/Details), and Reviews %>
     <div style="display: flex; flex-direction: column; flex: 1;">
-      <h1 style="color: #fff; margin: 0; font-size: 2.5rem;"><%= @movie.title %></h1>
-      <p style="color: #678; font-weight: bold;"><%= @movie.release_date.year if @movie.release_date %></p>
-      <p style="line-height: 1.5; margin: 20px 0;"><%= @movie.synopsis %></p>
+      <h1 style="color: #fff; margin: 0; font-size: 2.5rem; font-family: 'Georgia', serif;"><%= @movie.title %></h1>
+      <p style="color: #678; font-weight: bold; margin-top: 5px;">
+        <%= @movie.release_date.year if @movie.release_date %> 
+        <% director = @movie.credits.find_by(job: 'Director') %>
+        <% if director %>
+           · Directed by <%= link_to director.cast.name, cast_path(director.cast), style: "color: #fff; text-decoration: none;" %>
+        <% end %>
+      </p>
+      
+      <p style="line-height: 1.5; margin: 20px 0; font-size: 1.05rem;"><%= @movie.synopsis %></p>
 
-      <hr style="border: 0; border-top: 1px solid #2c3440; margin: 30px 0;">
+      <%# --- TABS NAVIGATION --- %>
+      <div style="display: flex; gap: 25px; border-bottom: 1px solid #2c3440; margin-bottom: 20px;">
+        <button onclick="openTab(event, 'tab-cast')" class="tab-link active" style="background:none; border:none; color:#fff; padding: 10px 0; cursor:pointer; font-size:0.75rem; letter-spacing:1px; border-bottom: 2px solid #00e054;">CAST</button>
+        <button onclick="openTab(event, 'tab-crew')" class="tab-link" style="background:none; border:none; color:#9ab; padding: 10px 0; cursor:pointer; font-size:0.75rem; letter-spacing:1px; border-bottom: 2px solid transparent;">CREW</button>
+        <button onclick="openTab(event, 'tab-details')" class="tab-link" style="background:none; border:none; color:#9ab; padding: 10px 0; cursor:pointer; font-size:0.75rem; letter-spacing:1px; border-bottom: 2px solid transparent;">DETAILS</button>
+        <button onclick="openTab(event, 'tab-genres')" class="tab-link" style="background:none; border:none; color:#9ab; padding: 10px 0; cursor:pointer; font-size:0.75rem; letter-spacing:1px; border-bottom: 2px solid transparent;">GENRES</button>
+      </div>
 
-      <%# 1. Render the Cast Grid %>
-      <h4 style="color: #fff; border-bottom: 1px solid #456; padding-bottom: 5px; font-size: 0.8rem;">CAST</h4>
-      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-        <% @credits.each do |credit| %>
-          <%= link_to cast_path(credit.cast), style: "text-decoration: none; color: #fff; font-size: 0.8rem;" do %>
-            <div style="background: #1a2129; padding: 5px; border-radius: 3px; border: 1px solid #2c3440;">
-              <%= credit.cast.name %> 
-              <small style="color: #678; display: block;">as <%= credit.role %></small>
+      <%# --- TAB CONTENT: CAST --- %>
+      <div id="tab-cast" class="movie-tab-content">
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 15px;">
+          <% @actors.each do |credit| %>
+            <div style="text-align: center;">
+              <%= link_to cast_path(credit.cast), style: "text-decoration: none;" do %>
+                <div style="width: 70px; height: 70px; border-radius: 50%; overflow: hidden; margin: 0 auto 8px; border: 1px solid #456;">
+                  <%= image_tag (credit.cast.pic.present? ? credit.cast.pic : "https://via.placeholder.com/150"), style: "width: 100%; height: 100%; object-fit: cover;" %>
+                </div>
+                <div style="color: #fff; font-size: 0.75rem; font-weight: bold; line-height: 1.1;"><%= credit.cast.name %></div>
+              <% end %>
+              <div style="color: #678; font-size: 0.65rem; margin-top: 3px;">as <%= credit.character %></div>
             </div>
           <% end %>
+        </div>
+      </div>
+
+      <%# --- TAB CONTENT: CREW (Dotted Style) --- %>
+      <div id="tab-crew" class="movie-tab-content" style="display: none;">
+        <% @crew_groups.each do |job, members| %>
+          <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; font-size: 0.85rem;">
+            <span style="color: #678; text-transform: uppercase; letter-spacing: 1px; flex-shrink: 0;"><%= job %></span>
+            <span style="flex-grow: 1; border-bottom: 1px dotted #2c3440; margin: 0 10px;"></span>
+            <span style="color: #fff; text-align: right;">
+              <% members.each_with_index do |m, i| %>
+                <%= link_to m.cast.name, cast_path(m.cast), style: "color: #fff; text-decoration: none; font-weight: bold;" %><%= "," unless i == members.size - 1 %>
+              <% end %>
+            </span>
+          </div>
         <% end %>
       </div>
 
+      <%# --- TAB CONTENT: DETAILS --- %>
+      <div id="tab-details" class="movie-tab-content" style="display: none;">
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #232a33; padding-bottom: 5px;">
+            <span style="color: #678;">COUNTRY</span>
+            <span style="color: #fff;"><%= @movie.origin_country %></span>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #232a33; padding-bottom: 5px;">
+            <span style="color: #678;">LANGUAGE</span>
+            <span style="color: #fff;"><%= @movie.language %></span>
+          </div>
+          <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #232a33; padding-bottom: 5px;">
+            <span style="color: #678;">RUNTIME</span>
+            <span style="color: #fff;"><%= @movie.runtime %> mins</span>
+          </div>
+        </div>
+      </div>
+
+      <%# --- TAB CONTENT: GENRES --- %>
+      <div id="tab-genres" class="movie-tab-content" style="display: none;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <% @genres.each do |genre| %>
+            <span style="background: #2c3440; color: #fff; padding: 5px 12px; border-radius: 3px; font-size: 0.8rem; border: 1px solid #456;"><%= genre.name %></span>
+          <% end %>
+        </div>
+      </div>
+
       <%# 2. Render the Review Form Partial %>
-      <div style="margin-top: 40px;">
+      <div style="margin-top: 60px;">
         <%= render 'reviews/form', movie: @movie %>
       </div>
 
       <%# --- POPULAR REVIEWS SECTION --- %>
       <div style="margin-top: 40px;">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #456; padding-bottom: 5px;">
-          <h4 style="color: #fff; font-size: 0.8rem; margin: 0;">POPULAR REVIEWS</h4>
+          <h4 style="color: #fff; font-size: 0.8rem; margin: 0; letter-spacing: 1px;">POPULAR REVIEWS</h4>
           <%= link_to "ALL REVIEWS", movie_reviews_path(@movie), style: "font-size: 0.7rem; color: #00e054; text-decoration: none; font-weight: bold;" %>
         </div>
 
         <% @popular_reviews.each do |review| %>
-          <div style="display: flex; gap: 15px; margin-top: 20px; border-bottom: 1px solid #232a33; padding-bottom: 15px;">
-            <div style="width: 40px; height: 40px; background: #2c3440; border-radius: 50%; overflow: hidden; flex-shrink: 0;">
-            </div>
-            <div>
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <%= link_to review.user.name, user_path(review.user), style: "color: #fff; text-decoration: none; font-weight: bold; font-size: 0.9rem;" %>
-                \
-                <% user_rating = Rating.find_by(user: review.user, movie: @movie) %>
-                <% if user_rating %>
-                  <span style="color: #00e054; font-size: 0.8rem;">★ <%= user_rating.rating %></span>
+          <div onclick="window.location='<%= review_path(review) %>'" style="display: flex; gap: 20px; padding: 30px 0; border-bottom: 1px solid #232a33;">
+            <%# User Avatar %>
+            <%= link_to user_path(review.user),onclick: "event.stopPropagation();",style: "text-decoration:none; flex-shrink:0;" do %>
+
+              <div style="width: 50px; height: 50px; background: #2c3440; border-radius: 50%; overflow: hidden; flex-shrink: 0; border: 1px solid #456;">
+                <% if review.user.profile_picture.attached? %>
+                  <%= image_tag review.user.profile_picture, style: "width: 100%; height: 100%; object-fit: cover;" %>
+                <% else %>
+                  <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #456; font-size: 1.2rem;">👤</div>
                 <% end %>
+              <%end%>
+            </div>
+
+            <div style="flex: 1;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <%= link_to review.user.name, user_path(review.user), style: "color: #fff; text-decoration: none; font-weight: bold; font-size: 1.1rem;" %>
+                    <% user_rating = Rating.find_by(user: review.user, movie: @movie) %>
+                    <% rating = Rating.find_by(user: review.user, movie: @movie) %>
+                    <% if user_rating %>
+                      <span style="color: #00e054; font-size: 0.9rem;">★ <%= user_rating.rating %></span>
+                    <% end %>
+                </div>
+
+                <div style="text-align: right;">
+                  <small style="display: block; color: #456; margin-bottom: 5px;"><%= review.created_at.strftime("%b %d, %Y") %></small>
+                  
+                  <%# LIKE BUTTON (Just below the date) %>
+                  <%= button_to toggle_like_movie_review_path(@movie, review), method: :post, onclick: "event.stopPropagation();", style: "background: none; border: none; cursor: pointer; padding: 0; display: inline-flex; align-items: center; gap: 5px; float: right;" do %>
+                    <span style="color: <%= review.likes.exists?(user: @user) ? '#ff4b4b' : '#678' %>; font-size: 1rem;">
+                      <%= review.likes.exists?(user: @user) ? '❤' : '♡' %>
+                    </span>
+                    <span style="color: #678; font-size: 0.8rem; font-weight: bold;"><%= review.likes.count %></span>
+                  <% end %>
+                </div>
               </div>
-              <p style="font-size: 0.9rem; margin-top: 5px; color: #9ab;"><%= review.content %></p>
+              
+              <div style="margin-top: 10px; color: #9ab; line-height: 1.6; font-size: 1rem;">
+                <%= simple_format review.content %>
+              </div>
+
+              <% if review.user == @user %>
+                <div style="display: flex; gap: 15px; margin-top: 15px; justify-content: flex-end;">
+                  <%= link_to "EDIT", edit_movie_review_path(@movie, review), onclick: "event.stopPropagation();", style: "color: #678; text-decoration: none; font-size: 0.7rem; font-weight: bold;" %>
+                  <%= button_to "DELETE", movie_review_path(@movie, review), method: :delete, onclick: "event.stopPropagation();", data: { confirm: "Delete review?" }, style: "background: none; border: none; color: #ff4b4b; font-size: 0.7rem; font-weight: bold; cursor: pointer; padding: 0;" %>
+                </div>
+              <% end %>
             </div>
           </div>
         <% end %>
@@ -68,11 +161,29 @@
     <div style="width: 230px; display: flex; flex-direction: column; gap: 10px; background: #1a2129; padding: 15px; border-radius: 4px; height: fit-content;">
       <div style="border-bottom: 1px solid #2c3440; padding-bottom: 10px; margin-bottom: 10px;">
         <label style="font-size: 0.7rem; color: #678;">YOUR RATING</label>
-        <%= render 'ratings/form', movie: @movie %>
+        <%= render 'ratings/form', movie: @movie, user: @user %>
       </div>
-      <%= render 'library_entries/watched', movie: @movie %>
-      <%= render 'library_entries/watchlist', movie: @movie %>
-      <%= render 'likes/movie_like', movie: @movie %>
+      <%= render 'library_entries/watched', movie: @movie, user: @user %>
+      <%= render 'library_entries/watchlist', movie: @movie, user: @user %>
+      <%= render 'likes/movie_like', movie: @movie, user: @user %>
     </div>
   </div>
 </div>
+
+<script>
+function openTab(evt, tabName) {
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("movie-tab-content");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+  tablinks = document.getElementsByClassName("tab-link");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].style.color = "#9ab";
+    tablinks[i].style.borderBottomColor = "transparent";
+  }
+  document.getElementById(tabName).style.display = "block";
+  evt.currentTarget.style.color = "#fff";
+  evt.currentTarget.style.borderBottomColor = "#00e054";
+}
+</script>

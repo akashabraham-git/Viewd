@@ -1,12 +1,78 @@
-<% content_for :title, "Editing user" %>
+<div style="max-width: 600px; margin: 60px auto; background: #1a2129; padding: 40px; border-radius: 8px; border: 1px solid #2c3440; color: #9ab; font-family: sans-serif;">
+  
+  <h2 style="color: #fff; margin-top: 0; border-bottom: 1px solid #2c3440; padding-bottom: 10px;">Account Settings</h2>
 
-<h1>Editing user</h1>
+  <%= form_with(model: @user, local: true, data: { turbo: false }) do |f| %>
+    
+    <div style="margin-bottom: 25px;">
+      <label style="display: block; color: #678; font-size: 0.7rem; margin-bottom: 10px; text-transform: uppercase;">Profile Picture</label>
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <div style="width: 60px; height: 60px; border-radius: 50%; overflow: hidden; background: #14181c; border: 1px solid #456;">
+          <% if @user.profile_picture.attached? %>
+            <%= image_tag @user.profile_picture, style: "width: 100%; height: 100%; object-fit: cover;" %>
+          <% end %>
+        </div>
+        <%= f.file_field :profile_picture, style: "color: #9ab; font-size: 0.8rem;" %>
+      </div>
+    </div>
 
-<%= render "form", user: @user %>
+    <%# Username Field %>
+    <div style="margin-bottom: 20px;">
+      <label style="display: block; color: #678; font-size: 0.7rem; margin-bottom: 8px; text-transform: uppercase;">Username</label>
+      <div style="display: flex; align-items: center; background: #14181c; border: 1px solid #456; border-radius: 4px; padding-left: 10px;">
+        <span style="color: #456;">@</span>
+        <%= f.text_field :username, style: "width: 100%; background: transparent; color: #fff; border: none; padding: 12px 10px; font-size: 1rem; outline: none;" %>
+      </div>
+    </div>
 
-<br>
+    <%# Name Field %>
+    <div style="margin-bottom: 20px;">
+      <label style="display: block; color: #678; font-size: 0.7rem; margin-bottom: 8px; text-transform: uppercase;">Display Name</label>
+      <%= f.text_field :name, style: "width: 100%; background: #14181c; color: #fff; border: 1px solid #456; padding: 12px; border-radius: 4px; font-size: 1rem;" %>
+    </div>
 
-<div>
-  <%= link_to "Show this user", @user %> |
-  <%= link_to "Back to users", users_path %>
+    <%# Email Field %>
+    <div style="margin-bottom: 20px;">
+      <label style="display: block; color: #678; font-size: 0.7rem; margin-bottom: 8px; text-transform: uppercase;">Email</label>
+      <%= f.text_field :email, style: "width: 100%; background: #14181c; color: #fff; border: 1px solid #456; padding: 12px; border-radius: 4px; font-size: 1rem;" %>
+    </div>
+
+    <div style="margin-bottom: 30px;">
+      <label style="display: block; color: #678; font-size: 0.7rem; margin-bottom: 8px; text-transform: uppercase;">Bio</label>
+      <%= f.text_area :bio, placeholder: "Write something about yourself...", style: "width: 100%; height: 120px; background: #14181c; color: #fff; border: 1px solid #456; padding: 12px; border-radius: 4px; font-size: 1rem; resize: none; line-height: 1.4;" %>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <%= f.submit "SAVE CHANGES", style: "background: #00e054; color: #000; border: none; padding: 12px 30px; font-weight: bold; border-radius: 3px; cursor: pointer; font-size: 0.8rem;" %>
+      <%= link_to "CANCEL", user_path(@user), style: "color: #9ab; text-decoration: none; font-size: 0.85rem; font-weight: bold;" %>
+    </div>
+  <% end %>
+</div>
+
+<hr style="margin: 40px 0; border: none; border-top: 1px solid #2c3440;">
+
+<div style="display: flex; justify-content: space-between; align-items: center;">
+  <div>
+    <h4 style="margin: 0; color: #ff4b4b; font-size: 0.85rem; text-transform: uppercase;">
+      Danger Zone
+    </h4>
+    <p style="margin: 5px 0 0; font-size: 0.75rem; color: #678;">
+      This action is permanent and cannot be undone.
+    </p>
+  </div>
+
+  <%= button_to "DELETE ACCOUNT",
+        user_path(@user),
+        method: :delete,
+        data: { confirm: "Are you sure? This will permanently delete your account." },
+        style: "
+          background: none;
+          border: 1px solid #ff4b4b;
+          color: #ff4b4b;
+          padding: 10px 20px;
+          font-size: 0.75rem;
+          font-weight: bold;
+          border-radius: 3px;
+          cursor: pointer;
+        " %>
 </div>

@@ -1,0 +1,62 @@
+<div style="max-width: 950px; margin: 0 auto; padding: 60px 20px; color: #9ab; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #14181c; min-height: 100vh;">
+  
+  <%# --- HEADER --- %>
+  <div style="text-align: center; margin-bottom: 60px;">
+    <h1 style="color: #fff; font-size: 2.2rem; font-family: 'Georgia', serif; margin-bottom: 10px;">Select a Pro Plan</h1>
+    <p style="font-size: 1.1rem; color: #678;">Upgrade your account for <%= @country.upcase %> and support the community.</p>
+  </div>
+
+  <%# --- PRICING CARDS --- %>
+  <div style="display: flex; gap: 30px; justify-content: center; align-items: stretch;">
+    <% @tiers.each do |tier| %>
+      <div style="flex: 1; background: #1b2228; border-radius: 8px; border: 1px solid #2c3440; display: flex; flex-direction: column; transition: transform 0.2s ease;">
+        
+        <%# Card Top Accent Color %>
+        <div style="height: 4px; width: 100%; background: <%= tier.gold? ? '#ffd700' : '#b9f2ff' %>; border-radius: 8px 8px 0 0;"></div>
+        
+        <div style="padding: 40px 30px; flex: 1; display: flex; flex-direction: column; text-align: center;">
+          
+          <%# Badge Image from your assets %>
+          <div style="margin-bottom: 20px;">
+            <%= image_tag "badges/#{tier.badge}.jpg", style: "width: 40px; height: 40px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(0,0,0,0.5));" %>
+          </div>
+
+          <h2 style="color: #fff; margin: 0; font-size: 1.5rem; letter-spacing: 2px; text-transform: uppercase;"><%= tier.name %></h2>
+          
+          <div style="margin: 25px 0; border-bottom: 1px solid #2c3440; padding-bottom: 25px;">
+            <span style="color: #fff; font-size: 2.5rem; font-weight: bold;"><%= tier.price %></span>
+            <span style="color: #678; font-size: 0.9rem;">/ MONTH</span>
+          </div>
+
+          <%# Advantages %>
+          <ul style="list-style: none; padding: 0; margin: 0 0 40px 0; text-align: left; flex: 1;">
+            <li style="margin-bottom: 15px; display: flex; align-items: flex-start; gap: 10px; font-size: 0.95rem;">
+              <span style="color: #00e054;">✓</span> 
+              <span>Display the <%= tier.badge.capitalize %> badge on your profile</span>
+            </li>
+            <li style="margin-bottom: 15px; display: flex; align-items: flex-start; gap: 10px; font-size: 0.95rem;">
+              <span style="color: #00e054;">✓</span> 
+              <span><%= tier.has_ads ? "Support us with limited ads" : "Completely ad-free experience" %></span>
+            </li>
+            <li style="margin-bottom: 15px; display: flex; align-items: flex-start; gap: 10px; font-size: 0.95rem;">
+              <span style="color: #00e054;">✓</span> 
+              <span><%= tier.can_view_stats ? "Access to deep-dive personal statistics" : "Standard member statistics" %></span>
+            </li>
+          </ul>
+
+          <%# Buy Button %>
+          <%= button_to membership_path(@user.membership, membership_tier_id: tier.id), 
+              method: :patch, 
+              style: "width: 100%; background: #00e054; color: #000; border: none; padding: 15px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;" do %>
+            Upgrade to <%= tier.name %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <%# --- FOOTER LINK --- %>
+  <div style="margin-top: 50px; text-align: center;">
+    <%= link_to "NO THANKS, TAKE ME BACK", user_path(@user), style: "color: #678; text-decoration: none; font-size: 0.8rem; letter-spacing: 1px; font-weight: bold;" %>
+  </div>
+</div>

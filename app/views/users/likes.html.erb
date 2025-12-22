@@ -1,0 +1,21 @@
+<div style="max-width: 1000px; margin: 0 auto; padding: 40px 20px; color: #9ab; font-family: sans-serif;">
+  <div style="border-bottom: 1px solid #2c3440; padding-bottom: 15px; margin-bottom: 30px;">
+    <h4 style="color: #678; margin: 0; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;">Likes</h4>
+    <h1 style="color: #fff; margin: 5px 0 0 0; font-size: 1.5rem;"><%= @user.name %>’s Liked Films</h1>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 20px;">
+    <% if @liked_movies.any? %>
+      <% @liked_movies.each do |movie| %>
+        <%= link_to movie_path(movie), style: "text-decoration: none;" do %>
+          <div style="aspect-ratio: 2/3; background: #1a2129; border-radius: 4px; overflow: hidden; border: 1px solid #2c3440;">
+            <%= image_tag movie.poster_url, style: "width: 100%; height: 100%; object-fit: cover;" %>
+          </div>
+          <p style="color: #9ab; font-size: 0.8rem; margin-top: 8px; text-align: center;"><%= movie.title %></p>
+        <% end %>
+      <% end %>
+    <% else %>
+      <p style="grid-column: 1/-1; text-align: center; padding: 100px; color: #456;">No liked movies yet.</p>
+    <% end %>
+  </div>
+</div>

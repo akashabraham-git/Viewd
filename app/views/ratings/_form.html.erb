@@ -1,48 +1,46 @@
-<% user = User.first %>
 <% current_rating = user.ratings.find_by(movie: movie)&.rating %>
 
 <div style="display: flex; align-items: center; font-family: sans-serif; white-space: nowrap;">
   <span style="margin-right: 12px; color: #9ab; font-size: 0.7rem; letter-spacing: 1px;">RATE</span>
 
-   
-  <%= form_with url: movie_ratings_path(movie), method: :post, local: true, 
+  <%= form_with url: movie_toggle_rating_path(movie), method: :post, local: true, 
                 class: "star-rating-form",
+                id: "rating-form-#{movie.id}",
                 style: "display: flex; flex-direction: row-reverse; justify-content: flex-end; align-items: center;" do |f| %>
     
     <style>
-      .star-rating-form {
-        direction: rtl; /* Sets the base direction to right-to-left */
-      }
-      
+      .star-rating-form { direction: rtl; }
       .star-radio { display: none; }
-
       .star-label { 
         font-size: 32px; 
-        color: #2c3440; 
+        color: #2c3440; /* Default empty color */
         cursor: pointer; 
         transition: color 0.1s;
         display: inline-block;
       }
       
+      /* Fill stars that are checked and all previous siblings */
       .star-radio:checked ~ .star-label { 
         color: #00e054; 
       }
       
+      /* Hover effects */
       .star-label:hover, 
       .star-label:hover ~ .star-label { 
-        color: #00e054 !important;
+        color: #40fb8c !important; /* Slightly brighter green on hover */
       }
     </style>
-    
+
     <% 5.downto(1) do |i| %>
       <input type="radio" 
              name="rating" 
-             id="star<%= i %>" 
+             id="star<%= i %>-<%= movie.id %>" 
              value="<%= i %>" 
              class="star-radio" 
-             onchange="this.form.submit()" 
-             <%= "checked" if current_rating == i %> />
-      <label for="star<%= i %>" class="star-label">★</label>
+             <%# JavaScript to handle the 'uncheck' if clicking the same value %>
+             onclick="if(this.dataset.waschecked === 'true') { this.checked = false; } this.form.submit();"
+             <%= "checked data-waschecked=true" if current_rating == i %> />
+      <label for="star<%= i %>-<%= movie.id %>" class="star-label">★</label>
     <% end %>
   <% end %>
 </div>

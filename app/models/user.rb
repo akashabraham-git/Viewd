@@ -7,12 +7,9 @@ class User < ApplicationRecord
   has_many :likes, dependent: :destroy
   has_one :membership, dependent: :destroy
   has_one :membership_tier, through: :membership
-  has_many :lists, dependent: :destroy
-  has_many :list_items, through: :lists, dependent: :destroy
   has_many :ratings, dependent: :destroy
   has_many :reviews, dependent: :destroy
-  has_many :favorites, -> { order(position: :asc) }, dependent: :destroy
-  has_many :favorite_movies, through: :favorites, source: :movie
+  has_one_attached :profile_picture
 
   validates :username, presence: true, uniqueness: true, length: {minimum: 3, maximum: 20}, format: {with: /\A[a-zA-Z0-9_.]+\z/}
   validates :email, presence: true, uniqueness: true, format: {with: URI::MailTo::EMAIL_REGEXP}
@@ -51,9 +48,9 @@ class User < ApplicationRecord
   def create_default_membership
     tier = MembershipTier.find_by(name: 'Free', country: self.country)
     if tier.nil?
-      tier = MembershipTier.find_by(name: 'Free', country: :usa)
+      tier = MembershipTier.find_by(name: 'Free', country: :unknown)
     end
-    create_membership!(membership_tier: tier, status: :active)
+    create_membership(membership_tier: tier, status: :active)
   end
 
   def send_welcome_email
