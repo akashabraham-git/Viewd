@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_12_22_042210) do
+ActiveRecord::Schema[7.2].define(version: 2025_12_29_111522) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -52,10 +52,12 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_22_042210) do
   end
 
   create_table "connections", force: :cascade do |t|
-    t.integer "follower_id"
-    t.integer "following_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "follower_id"
+    t.bigint "following_id"
+    t.index ["follower_id"], name: "index_connections_on_follower_id"
+    t.index ["following_id"], name: "index_connections_on_following_id"
   end
 
   create_table "credits", force: :cascade do |t|
@@ -84,24 +86,24 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_22_042210) do
 
   create_table "library_entries", force: :cascade do |t|
     t.bigint "movie_id", null: false
-    t.bigint "user_id", null: false
     t.boolean "watched", default: false
     t.date "watched_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "in_watchlist", default: false
+    t.bigint "member_id"
+    t.index ["member_id"], name: "index_library_entries_on_member_id"
     t.index ["movie_id"], name: "index_library_entries_on_movie_id"
-    t.index ["user_id"], name: "index_library_entries_on_user_id"
   end
 
   create_table "likes", force: :cascade do |t|
-    t.bigint "user_id", null: false
     t.string "likeable_type", null: false
     t.bigint "likeable_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "member_id"
     t.index ["likeable_type", "likeable_id"], name: "index_likes_on_likeable"
-    t.index ["user_id"], name: "index_likes_on_user_id"
+    t.index ["member_id"], name: "index_likes_on_member_id"
   end
 
   create_table "list_items", force: :cascade do |t|
@@ -124,6 +126,13 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_22_042210) do
     t.index ["user_id"], name: "index_lists_on_user_id"
   end
 
+  create_table "members", force: :cascade do |t|
+    t.text "bio"
+    t.integer "country"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "membership_tiers", force: :cascade do |t|
     t.string "name"
     t.integer "price"
@@ -136,7 +145,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_22_042210) do
   end
 
   create_table "memberships", force: :cascade do |t|
-    t.bigint "user_id", null: false
     t.bigint "membership_tier_id", null: false
     t.integer "status"
     t.datetime "started_at"
@@ -144,8 +152,16 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_22_042210) do
     t.string "transaction_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "member_id"
+    t.index ["member_id"], name: "index_memberships_on_member_id"
     t.index ["membership_tier_id"], name: "index_memberships_on_membership_tier_id"
-    t.index ["user_id"], name: "index_memberships_on_user_id"
+  end
+
+  create_table "moderators", force: :cascade do |t|
+    t.string "employee_number"
+    t.string "department"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "movies", force: :cascade do |t|
@@ -160,6 +176,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_22_042210) do
     t.integer "status"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "moderator_id"
   end
 
   create_table "ratings", force: :cascade do |t|
@@ -174,12 +191,12 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_22_042210) do
 
   create_table "reviews", force: :cascade do |t|
     t.text "content"
-    t.bigint "user_id", null: false
     t.bigint "movie_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "member_id"
+    t.index ["member_id"], name: "index_reviews_on_member_id"
     t.index ["movie_id"], name: "index_reviews_on_movie_id"
-    t.index ["user_id"], name: "index_reviews_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -187,28 +204,28 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_22_042210) do
     t.string "name"
     t.string "email"
     t.string "password"
-    t.string "bio"
-    t.integer "country"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "actable_id"
+    t.string "actable_type"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "connections", "users", column: "follower_id"
-  add_foreign_key "connections", "users", column: "following_id"
+  add_foreign_key "connections", "members", column: "follower_id"
+  add_foreign_key "connections", "members", column: "following_id"
   add_foreign_key "credits", "casts"
   add_foreign_key "credits", "movies"
+  add_foreign_key "library_entries", "members"
   add_foreign_key "library_entries", "movies"
-  add_foreign_key "library_entries", "users"
-  add_foreign_key "likes", "users"
+  add_foreign_key "likes", "members"
   add_foreign_key "list_items", "lists"
   add_foreign_key "list_items", "movies"
   add_foreign_key "lists", "users"
+  add_foreign_key "memberships", "members"
   add_foreign_key "memberships", "membership_tiers"
-  add_foreign_key "memberships", "users"
   add_foreign_key "ratings", "movies"
   add_foreign_key "ratings", "users"
+  add_foreign_key "reviews", "members"
   add_foreign_key "reviews", "movies"
-  add_foreign_key "reviews", "users"
 end

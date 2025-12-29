@@ -1,6 +1,19 @@
-<% entry = LibraryEntry.find_by(user: @user, movie: @movie) %>
-<%= button_to movie_toggle_watchlist_path(@movie), 
-                method: :post, 
-                class: "btn #{entry&.in_watchlist ? 'btn-success' : 'btn-outline-secondary'}" do %>
-    <%= entry&.in_watchlist ? "✓ In Watchlist" : "+ Add to Watchlist" %>
+<%# Access library_entries via the Member identity (actable) %>
+<% entry = nil %>
+<% if user&.actable_type == 'Member' %>
+  <% entry = user.actable.library_entries.find_by(movie: movie) %>
+<% end %>
+
+<div id="watchlist-section-<%= movie.id %>">
+  <% if entry&.in_watchlist %>
+    <%= button_to "REMOVE FROM WATCHLIST", movie_library_entry_path(movie, entry), 
+        method: :patch, 
+        params: { library_entry: { in_watchlist: false } },
+        style: "background: #cc3333; color: #fff; border: none; padding: 5px 15px; border-radius: 3px; font-weight: bold; cursor: pointer; font-size: 0.7rem;" %>
+  <% elsif user&.actable_type == 'Member' %>
+    <%= button_to "+ WATCHLIST", movie_library_entries_path(movie), 
+        method: :post,
+        params: { in_watchlist: true },
+        style: "background: #456; color: #fff; border: none; padding: 5px 15px; border-radius: 3px; font-weight: bold; cursor: pointer; font-size: 0.7rem;" %>
   <% end %>
+</div>

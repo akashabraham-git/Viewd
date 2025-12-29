@@ -1,0 +1,34 @@
+class Member < ApplicationRecord
+  has_one :user, as: :actable, dependent: :destroy
+  has_one :membership, dependent: :destroy
+  has_one :membership_tier, through: :membership
+  has_one_attached :profile_picture
+  has_many :incoming_connections, class_name: "Connection", foreign_key: "following_id", dependent: :destroy
+  has_many :followers, through: :incoming_connections, source: :follower
+  has_many :outgoing_connections, class_name: "Connection", foreign_key: "follower_id", dependent: :destroy
+  has_many :following, through: :outgoing_connections, source: :following
+  has_many :library_entries, dependent: :destroy
+  has_many :likes, dependent: :destroy
+  has_many :ratings, dependent: :destroy
+  has_many :reviews, dependent: :destroy
+
+  enum :country, { 
+    unknown: 0, 
+    usa: 1, 
+    india: 2, 
+    uk: 3, 
+    canada: 4, 
+    australia: 5,
+    germany: 6,
+    france: 7,
+    japan: 8,
+    brazil: 9 
+  }
+
+  validates :bio, length: { maximum: 500 }
+
+  def following?(other_user)
+    following.include?(other_user)
+  end
+
+end

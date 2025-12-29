@@ -1,7 +1,7 @@
 class ReviewsController < ApplicationController
-  before_action :set_movie, only: [:index, :create]
+  before_action :set_movie, only: [:index, :create, :edit]
   before_action :set_review, only: [:edit, :update, :destroy]
-  before_action :set_current_user, only: [:index, :show]
+  before_action :set_current_user, only: [:index, :show, :create]
 
   def index
     @reviews = @movie.reviews
@@ -13,13 +13,11 @@ class ReviewsController < ApplicationController
 
   def show
     @review = Review.includes(:movie, :user).find(params[:id])
-    @rating = Rating.find_by(user: @review.user, movie: @review.movie).rating
+    @rating = Rating.find_by(user: @review.user, movie: @review.movie)&.rating
   end
 
   def create
-    @review = @movie.reviews.build(review_params)
-    @review.user = User.second
-
+    @review = Review.new(review_params.merge(movie: @movie, user: @current_user))
     if @review.save
       redirect_to movie_path(@movie)
     else
@@ -28,7 +26,6 @@ class ReviewsController < ApplicationController
   end
 
   def edit
-    @movie = @review.movie
     session[:review_return_to] = request.referer
   end
 
@@ -37,13 +34,16 @@ class ReviewsController < ApplicationController
       return_path = session.delete(:review_return_to) 
       redirect_to return_path
     else
-      render :edit, alert: "#{@user.errors.full_messages.to_sentence}"
+      redirect_back fallback_location: edit_review_path(@review), alert: "#{@review.errors.full_messages.to_sentence}"
     end
   end
 
   def destroy
-    @review.destroy
-    redirect_back fallback_location: root_path
+    if @review.destroy
+      redirect_back fallback_location: root_path
+    else
+      redirect_back fallback_location: movie_path(@movie), alert: "#{@review.errors.full_messages.to_sentence}"
+    end
   end
 
   private

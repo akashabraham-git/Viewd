@@ -11,16 +11,20 @@ Rails.application.routes.draw do
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
 
-  resources :movies, only: [:index, :show] do
+resources :movies do
+  member do
     post 'toggle_watched', to: 'library_entries#toggle_watched'
     post 'toggle_watchlist', to: 'library_entries#toggle_watchlist'
     post 'toggle_movie_like', to: 'likes#toggle_movie_like'
     post 'toggle_rating', to: 'ratings#toggle'
-    resources :reviews, only: [:create, :edit, :update, :destroy, :index] do
-      post 'toggle_like', to: 'likes#toggle_review_like', on: :member, as: :toggle_like
-    end
   end
 
+  resources :reviews, only: [:create, :edit, :update, :destroy, :index] do
+    post 'toggle_like', to: 'likes#toggle_review_like', on: :member, as: :toggle_like
+  end
+
+  resources :library_entries, only: [:create, :update, :destroy]
+end
 
   get 'users/:id/library', to: 'users#library', as: :library_user
   get 'users/:id/watchlist', to: 'users#watchlist', as: :watchlist_user
@@ -30,7 +34,7 @@ Rails.application.routes.draw do
   resources :users, only: [:show, :edit, :update, :destroy]
   resources :favorites, only: [:create, :destroy]
   resources :connections, only: [:index, :create, :destroy]
-  resources :cast, only: [:show]
+  resources :casts
   resources :reviews, only: [:show, :create, :edit, :destroy]
   resources :memberships, only: [:index, :update]
     

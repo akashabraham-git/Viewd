@@ -1,6 +1,18 @@
-<div style="max-width: 1000px; margin: 0 auto; color: #9ab;">
+<div style="max-width: 1000px; margin: 0 auto; color: #9ab; font-family: sans-serif;">
   
-  <%if @query.present? %>
+  <% if @current_user&.actable_type == 'Moderator' %>
+    <div style="background: #1a2129; border: 1px solid #ffd700; padding: 20px; border-radius: 8px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        <h3 style="color: #ffd700; margin: 0; font-size: 0.9rem; text-transform: uppercase;">Movie Management</h3>
+        <p style="margin: 5px 0 0; font-size: 0.75rem; color: #678;">Logged in as Staff: <%= @current_user.name %></p>
+      </div>
+      <%= link_to "+ ADD NEW MOVIE", new_movie_path, 
+          style: "background: #ffd700; color: #000; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 0.8rem;" %>
+    </div>
+  <% end %>
+
+  <%# SEARCH TABS %>
+  <% if @query.present? %>
     <div style="display: flex; gap: 20px; border-bottom: 1px solid #2c3440; margin-bottom: 25px; padding-bottom: 10px; font-size: 0.8rem; font-weight: bold; text-transform: uppercase;">
       <%= link_to "Movies", movies_path(query: @query, type: "movies"), 
           style: "text-decoration: none; color: #{@type == 'movies' ? '#fff' : '#678'}; border-bottom: #{@type == 'movies' ? '2px solid #00e054' : 'none'}; padding-bottom: 10px;" %>
@@ -11,21 +23,34 @@
       <%= link_to "Cast", movies_path(query: @query, type: "cast"), 
           style: "text-decoration: none; color: #{@type == 'cast' ? '#fff' : '#678'}; border-bottom: #{@type == 'cast' ? '2px solid #00e054' : 'none'}; padding-bottom: 10px;" %>
     </div>
-  <%end%>
+  <% end %>
 
+  <%# RESULTS GRID %>
   <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px;">
     
+    <%# USER RESULTS %>
     <% if @type == "users" %>
       <% @results.each do |user| %>
         <%= link_to user_path(user), style: "text-decoration: none; color: inherit;" do %>
           <div style="background: #1a2129; padding: 20px; border-radius: 8px; text-align: center; border: 1px solid #2c3440; transition: border 0.2s;">
-            <div style="width: 70px; height: 70px; background: #2c3440; border-radius: 50%; margin: 0 auto 15px; border: 2px solid #fff;"></div>
+            
+            <%# Polymorphic Picture Check: Only Members have profile pictures %>
+            <% if user.actable_type == 'Member' && user.actable.profile_picture&.attached? %>
+              <%= image_tag user.actable.profile_picture, 
+                  style: "width: 70px; height: 70px; background: #2c3440; border-radius: 50%; margin: 0 auto 15px; border: 2px solid #fff; object-fit: cover; display: block;" %>
+            <% else %>
+              <div style="width: 70px; height: 70px; background: #2c3440; border-radius: 50%; margin: 0 auto 15px; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; color: #456; font-size: 1.5rem;">
+                👤
+              </div>
+            <% end %>
+
             <strong style="color: #fff; display: block;"><%= user.name %></strong>
-            <small style="color: #678;">View Profile</small>
+            <small style="color: rgba(180, 188, 195, 1);">@<%= user.username %></small>
           </div>
         <% end %>
       <% end %>
 
+    <%# CAST RESULTS %>
     <% elsif @type == "cast" %>
       <% @results.each do |person| %>
         <%= link_to cast_path(person), style: "text-decoration: none; color: inherit;" do %>
@@ -38,18 +63,29 @@
         <% end %>
       <% end %>
 
+    <%# MOVIE RESULTS %>
     <% else %>
       <% @results.each do |movie| %>
-        <div style="display: flex; flex-direction: column;">
+        <div style="display: flex; flex-direction: column; position: relative;">
           <%= link_to movie_path(movie), style: "text-decoration: none; color: inherit;" do %>
-            <div style="aspect-ratio: 2/3; overflow: hidden; border-radius: 4px; border: 1px solid #2c3440;">
+            <div style="aspect-ratio: 2/3; overflow: hidden; border-radius: 4px; border: 1px solid #2c3440; transition: border 0.2s;">
               <% if movie.poster_url.present? %>
                 <%= image_tag movie.poster_url, style: "width: 100%; height: 100%; object-fit: cover" %>
               <% else %>
                 <div style="width: 100%; height: 100%; background: #2c3440; display: flex; align-items: center; justify-content: center;">No Poster</div>
               <% end %>
             </div>
-            <h3 style="color: #fff; font-size: 0.95rem; margin-top: 10px; font-weight: normal;"><%= movie.title %></h3>
+            <h3 style="color: #fff; font-size: 0.95rem; margin-top: 10px; font-weight: normal; margin-bottom: 5px;"><%= movie.title %></h3>
+          <% end %>
+
+          <%# MODERATOR ACTIONS PER MOVIE %>
+          <% if @current_user&.actable_type == 'Moderator' %>
+            <div style="display: flex; gap: 10px; margin-top: 5px;">
+              <%= link_to "EDIT", edit_movie_path(movie), style: "font-size: 0.65rem; color: #9ab; text-decoration: none; border: 1px solid #456; padding: 2px 6px; border-radius: 2px;" %>
+              <%= button_to "DEL", movie_path(movie), method: :delete, 
+                  form: { data: { turbo_confirm: 'Delete this movie permanently?' } },
+                  style: "font-size: 0.65rem; color: #ff4b4b; background: none; border: 1px solid #ff4b4b; padding: 2px 6px; border-radius: 2px; cursor: pointer;" %>
+            </div>
           <% end %>
         </div>
       <% end %>

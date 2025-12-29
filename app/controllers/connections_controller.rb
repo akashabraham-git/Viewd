@@ -8,7 +8,11 @@ class ConnectionsController < ApplicationController
     if @type == "following"
       @users = @user.following
     else
-      @users = @user.followers
+      if @type == "followers"
+        @users = @user.followers
+      else
+        redirect_to user_path(@user), alert: "Invalid operation"
+      end
     end
   end
 

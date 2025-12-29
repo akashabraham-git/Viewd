@@ -36,8 +36,8 @@
                       border-radius: 50%;
                       overflow: hidden;
                       border: 1px solid #456;">
-            <% if review.user.profile_picture.attached? %>
-              <%= image_tag review.user.profile_picture,
+            <% if review.user.actable.profile_picture&.attached? %>
+              <%= image_tag review.user.actable.profile_picture,
                   style: "width:100%; height:100%; object-fit:cover;" %>
             <% else %>
               <div style="display:flex;
@@ -141,7 +141,7 @@
                             font-weight:bold;" %>
 
               <%= button_to "DELETE",
-                    movie_review_path(@movie, review),
+                    movie_path(@movie),
                     method: :delete,
                     onclick: "event.stopPropagation();",
                     data: { confirm: "Delete review?" },

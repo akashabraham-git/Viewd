@@ -4,19 +4,25 @@
 
   <%= form_with(model: @user, local: true, data: { turbo: false }) do |f| %>
     
-    <div style="margin-bottom: 25px;">
-      <label style="display: block; color: #678; font-size: 0.7rem; margin-bottom: 10px; text-transform: uppercase;">Profile Picture</label>
-      <div style="display: flex; align-items: center; gap: 20px;">
-        <div style="width: 60px; height: 60px; border-radius: 50%; overflow: hidden; background: #14181c; border: 1px solid #456;">
-          <% if @user.profile_picture.attached? %>
-            <%= image_tag @user.profile_picture, style: "width: 100%; height: 100%; object-fit: cover;" %>
-          <% end %>
+    <%# PROFILE PICTURE - Only for Members %>
+    <% if @user.actable_type == 'Member' %>
+      <div style="margin-bottom: 25px;">
+        <label style="display: block; color: #678; font-size: 0.7rem; margin-bottom: 10px; text-transform: uppercase;">Profile Picture</label>
+        <div style="display: flex; align-items: center; gap: 20px;">
+          <div style="width: 60px; height: 60px; border-radius: 50%; overflow: hidden; background: #14181c; border: 1px solid #456;">
+            <%# We check @user.actable because the photo is stored in the Member table %>
+            <% if @user.actable&.profile_picture&.attached? %>
+              <%= image_tag @user.actable.profile_picture, style: "width: 100%; height: 100%; object-fit: cover;" %>
+            <% else %>
+               <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #456; font-size: 1.5rem;">👤</div>
+            <% end %>
+          </div>
+          <%= f.file_field :profile_picture, style: "color: #9ab; font-size: 0.8rem;" %>
         </div>
-        <%= f.file_field :profile_picture, style: "color: #9ab; font-size: 0.8rem;" %>
       </div>
-    </div>
+    <% end %>
 
-    <%# Username Field %>
+    <%# Username Field - Common to both %>
     <div style="margin-bottom: 20px;">
       <label style="display: block; color: #678; font-size: 0.7rem; margin-bottom: 8px; text-transform: uppercase;">Username</label>
       <div style="display: flex; align-items: center; background: #14181c; border: 1px solid #456; border-radius: 4px; padding-left: 10px;">
@@ -25,22 +31,25 @@
       </div>
     </div>
 
-    <%# Name Field %>
+    <%# Name Field - Delegated to Member/Moderator in User.rb %>
     <div style="margin-bottom: 20px;">
       <label style="display: block; color: #678; font-size: 0.7rem; margin-bottom: 8px; text-transform: uppercase;">Display Name</label>
       <%= f.text_field :name, style: "width: 100%; background: #14181c; color: #fff; border: 1px solid #456; padding: 12px; border-radius: 4px; font-size: 1rem;" %>
     </div>
 
-    <%# Email Field %>
+    <%# Email Field - Common to both %>
     <div style="margin-bottom: 20px;">
-      <label style="display: block; color: #678; font-size: 0.7rem; margin-bottom: 8px; text-transform: uppercase;">Email</label>
-      <%= f.text_field :email, style: "width: 100%; background: #14181c; color: #fff; border: 1px solid #456; padding: 12px; border-radius: 4px; font-size: 1rem;" %>
+      <label style="display: block; color: #678; font-size: 0.7rem; margin-bottom: 8px; text-transform: uppercase;">Email Address</label>
+      <%= f.email_field :email, style: "width: 100%; background: #14181c; color: #fff; border: 1px solid #456; padding: 12px; border-radius: 4px; font-size: 1rem;" %>
     </div>
 
-    <div style="margin-bottom: 30px;">
-      <label style="display: block; color: #678; font-size: 0.7rem; margin-bottom: 8px; text-transform: uppercase;">Bio</label>
-      <%= f.text_area :bio, placeholder: "Write something about yourself...", style: "width: 100%; height: 120px; background: #14181c; color: #fff; border: 1px solid #456; padding: 12px; border-radius: 4px; font-size: 1rem; resize: none; line-height: 1.4;" %>
-    </div>
+    <%# Bio Field - Only for Members (Delegated in User.rb) %>
+    <% if @user.actable_type == 'Member' %>
+      <div style="margin-bottom: 30px;">
+        <label style="display: block; color: #678; font-size: 0.7rem; margin-bottom: 8px; text-transform: uppercase;">Bio</label>
+        <%= f.text_area :bio, placeholder: "Write something about yourself...", style: "width: 100%; height: 120px; background: #14181c; color: #fff; border: 1px solid #456; padding: 12px; border-radius: 4px; font-size: 1rem; resize: none; line-height: 1.4;" %>
+      </div>
+    <% end %>
 
     <div style="display: flex; justify-content: space-between; align-items: center;">
       <%= f.submit "SAVE CHANGES", style: "background: #00e054; color: #000; border: none; padding: 12px 30px; font-weight: bold; border-radius: 3px; cursor: pointer; font-size: 0.8rem;" %>
@@ -51,7 +60,7 @@
 
 <hr style="margin: 40px 0; border: none; border-top: 1px solid #2c3440;">
 
-<div style="display: flex; justify-content: space-between; align-items: center;">
+<div style="max-width: 600px; margin: 0 auto 60px auto; display: flex; justify-content: space-between; align-items: center;">
   <div>
     <h4 style="margin: 0; color: #ff4b4b; font-size: 0.85rem; text-transform: uppercase;">
       Danger Zone
@@ -61,18 +70,18 @@
     </p>
   </div>
 
-  <%= button_to "DELETE ACCOUNT",
-        user_path(@user),
-        method: :delete,
-        data: { confirm: "Are you sure? This will permanently delete your account." },
-        style: "
-          background: none;
-          border: 1px solid #ff4b4b;
-          color: #ff4b4b;
-          padding: 10px 20px;
-          font-size: 0.75rem;
-          font-weight: bold;
-          border-radius: 3px;
-          cursor: pointer;
-        " %>
+  <%= button_to "CLOSE ACCOUNT",
+      user_path(@user),
+      method: :delete,
+      form: { data: { turbo_confirm: "Are you sure? This will permanently delete your account." } },
+      style: "
+        background: none;
+        border: 1px solid #ff4b4b;
+        color: #ff4b4b;
+        padding: 10px 20px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        border-radius: 3px;
+        cursor: pointer;
+      " %>
 </div>

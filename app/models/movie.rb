@@ -6,6 +6,7 @@ class Movie < ApplicationRecord
   has_many :credits
   has_many :cast_members, through: :credits, source: :cast
   has_many :library_entries
+  belongs_to :moderator, optional: true
 
   def average_rating
     ratings.average(:rating).to_f.round(1)

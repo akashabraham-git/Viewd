@@ -45,5 +45,4 @@ class LibraryEntriesController < ApplicationController
       redirect_to movies_path, alert: "Please log in to enter activity"
     end
   end
-
 end

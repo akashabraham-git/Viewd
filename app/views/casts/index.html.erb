@@ -1,0 +1,44 @@
+<div style="max-width: 1000px; margin: 40px auto; color: #9ab; font-family: sans-serif;">
+  
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #2c3440; padding-bottom: 20px;">
+    <div>
+      <h1 style="color: #fff; margin: 0;">Cast & Crew</h1>
+      <p style="font-size: 0.8rem; color: #678; margin-top: 5px;">Database of actors, directors, and creators.</p>
+    </div>
+    
+    <%# ONLY SHOW ADD OPTION TO MODERATORS %>
+    <% if @current_user&.actable_type == 'Moderator' %>
+      <%= link_to "+ ADD PERSON", new_cast_path, 
+          style: "background: #00e054; color: #000; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 0.8rem;" %>
+    <% end %>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px;">
+    <% @casts.each do |person| %>
+      <div style="background: #1a2129; padding: 20px; border-radius: 8px; border: 1px solid #2c3440; text-align: center; position: relative;">
+        
+        <%= link_to cast_path(person), style: "text-decoration: none;" do %>
+          <div style="width: 80px; height: 80px; margin: 0 auto 15px; border-radius: 50%; overflow: hidden; background: #2c3440; border: 2px solid #456;">
+            <% if person.pic.present? %>
+              <%= image_tag person.pic, style: "width: 100%; height: 100%; object-fit: cover;" %>
+            <% else %>
+              <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #456;">👤</div>
+            <% end %>
+          </div>
+          <strong style="color: #fff; display: block; font-size: 0.9rem;"><%= person.name %></strong>
+        <% end %>
+
+        <%# MODERATOR ACTIONS %>
+        <% if @current_user&.actable_type == 'Moderator' %>
+          <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid #2c3440; display: flex; justify-content: center; gap: 10px;">
+            <%= link_to "EDIT", edit_cast_path(person), style: "font-size: 0.65rem; color: #9ab; text-decoration: none;" %>
+            <%= button_to "DEL", cast_path(person), method: :delete, 
+                form: { data: { turbo_confirm: "Delete #{person.name}?" } },
+                style: "background: none; border: none; color: #ff4b4b; font-size: 0.65rem; cursor: pointer;" %>
+          </div>
+        <% end %>
+        
+      </div>
+    <% end %>
+  </div>
+</div>

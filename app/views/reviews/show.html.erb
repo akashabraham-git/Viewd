@@ -39,8 +39,8 @@
                       border-radius:50%;
                       overflow:hidden;
                       background:#2c3440;">
-            <% if @review.user.profile_picture.attached? %>
-              <%= image_tag @review.user.profile_picture,
+            <% if @review.user.actable.profile_picture&.attached? %>
+              <%= image_tag @review.user.actable.profile_picture,
                   style:"width:100%;height:100%;object-fit:cover;" %>
             <% else %>
               <div style="width:100%;height:100%;

@@ -1,17 +1,19 @@
-<% like = Like.find_by(likeable: movie, user: user) %>
-
-<%= button_to movie_toggle_movie_like_path(movie), 
-               method: :post, 
-               data: { turbo: false },
-               style: "background: none; border: none; cursor: pointer; width: 100%; padding: 10px 0; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s;" do %>
-  
-  <span style="font-size: 1.4rem; color: <%= like ? '#00e054' : '#678' %>; transition: transform 0.1s ease-in-out;" 
-        onmouseover="this.style.transform='scale(1.1)'" 
-        onmouseout="this.style.transform='scale(1)'">
-    <%= like ? "♥" : "♡" %>
-  </span>
-
-  <span style="color: <%= like ? '#fff' : '#9ab' %>; font-size: 0.8rem; font-weight: bold; letter-spacing: 1px;">
-    <%= like ? "LIKED" : "LIKE" %>
-  </span>
+<%# Access likes via the Member identity since user_id was replaced by member_id %>
+<% liked = false %>
+<% if user&.actable_type == 'Member' %>
+  <% liked = user.actable.likes.exists?(likeable: movie) %>
 <% end %>
+
+<div id="like-section-<%= movie.id %>">
+  <% if liked %>
+    <%= button_to movie_toggle_like_path(movie), method: :post, remote: true, style: "background: none; border: none; cursor: pointer;" do %>
+      <span style="color: #ff8000; font-size: 1.5rem;">♥</span>
+    <% end %>
+  <% elsif user&.actable_type == 'Member' %>
+    <%= button_to movie_toggle_like_path(movie), method: :post, remote: true, style: "background: none; border: none; cursor: pointer;" do %>
+      <span style="color: #456; font-size: 1.5rem;">♡</span>
+    <% end %>
+  <% else %>
+     <span style="color: #2c3440; font-size: 1.5rem;">♡</span>
+  <% end %>
+</div>
