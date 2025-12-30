@@ -9,7 +9,7 @@
 
   <%# Only render the form if the user is a Member and can actually create a rating %>
   <% if user&.actable_type == 'Member' %>
-    <%= form_with url: movie_toggle_rating_path(movie), method: :post, local: true, 
+    <%= form_with url: toggle_rating_movie_path(movie), method: :post, local: true, 
                   class: "star-rating-form",
                   id: "rating-form-#{movie.id}",
                   style: "display: flex; flex-direction: row-reverse; justify-content: flex-end; align-items: center;" do |f| %>

@@ -1,0 +1,15 @@
+<div style="max-width: 500px; margin: 60px auto; background: #1a2129; padding: 30px; border-radius: 8px; border: 1px solid #2c3440;">
+  <h2 style="color: #fff; margin-bottom: 20px;"><%= action_name.capitalize %> Genre</h2>
+
+  <%= form_with(model: @genre, local: true) do |f| %>
+    <div style="margin-bottom: 25px;">
+      <%= f.label :name, "Genre Name", style: "display: block; color: #678; font-size: 0.7rem; margin-bottom: 8px; text-transform: uppercase;" %>
+      <%= f.text_field :name, placeholder: "e.g. Sci-Fi", style: "width: 100%; background: #14181c; color: #fff; border: 1px solid #456; padding: 12px; border-radius: 4px; box-sizing: border-box;" %>
+    </div>
+
+    <div style="display: flex; gap: 15px; align-items: center;">
+      <%= f.submit "SAVE GENRE", style: "background: #00e054; color: #000; border: none; padding: 12px 30px; font-weight: bold; border-radius: 3px; cursor: pointer;" %>
+      <%= link_to "CANCEL", genres_path, style: "color: #9ab; text-decoration: none; font-size: 0.8rem;" %>
+    </div>
+  <% end %>
+</div>

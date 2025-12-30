@@ -6,7 +6,8 @@ module Watchable extend ActiveSupport::Concern
   private
 
   def mark_as_watched
-    entry = LibraryEntry.find_or_initialize_by(user: user, movie: movie)
+    @current_user = User.second
+    entry = LibraryEntry.find_or_initialize_by(member: @current_user.actable, movie: movie)
     if entry.watched_date.nil?
       entry.update(watched_date: Date.today, in_watchlist: false)
     end

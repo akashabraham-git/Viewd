@@ -1,11 +1,11 @@
-<%= form_with(model: movie, local: true) do |f| %>
-  <div style="background: #1a2129; padding: 30px; border-radius: 8px; border: 1px solid #2c3440;">
+<%= form_with(model: movie, data: { controller: "nested-form" }) do |f| %>
+  <div style="background: #1a2129; padding: 30px; border-radius: 8px; border: 1px solid #2c3440; margin-bottom: 20px;">
     
+    <%# --- Standard Movie Fields --- %>
     <div style="margin-bottom: 20px;">
       <%= f.label :title, style: "display: block; color: #678; font-size: 0.7rem; margin-bottom: 8px; text-transform: uppercase;" %>
       <%= f.text_field :title, style: "width: 100%; background: #14181c; color: #fff; border: 1px solid #456; padding: 12px; border-radius: 4px;" %>
     </div>
-
     <div style="margin-bottom: 20px;">
       <%= f.label :synopsis, style: "display: block; color: #678; font-size: 0.7rem; margin-bottom: 8px; text-transform: uppercase;" %>
       <%= f.text_area :synopsis, style: "width: 100%; height: 100px; background: #14181c; color: #fff; border: 1px solid #456; padding: 12px; border-radius: 4px; resize: none;" %>
@@ -16,43 +16,70 @@
       <%= f.text_field :poster_url, style: "width: 100%; background: #14181c; color: #fff; border: 1px solid #456; padding: 12px; border-radius: 4px;" %>
     </div>
 
+    <div style="margin-bottom: 20px;">
+      <%= f.label :origin_country, "Country", style: "display: block; color: #678; font-size: 0.7rem; margin-bottom: 8px; text-transform: uppercase;" %>
+      <%= f.text_field :origin_country, style: "width: 100%; background: #14181c; color: #fff; border: 1px solid #456; padding: 12px; border-radius: 4px;" %>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <%= f.label :language, "Language", style: "display: block; color: #678; font-size: 0.7rem; margin-bottom: 8px; text-transform: uppercase;" %>
+      <%= f.text_field :language, style: "width: 100%; background: #14181c; color: #fff; border: 1px solid #456; padding: 12px; border-radius: 4px;" %>
+    </div>
+
+    <div style="margin-bottom: 20px;">
+      <%= f.label :runtime, "Runtime in minutes", style: "display: block; color: #678; font-size: 0.7rem; margin-bottom: 8px; text-transform: uppercase;" %>
+      <%= f.number_field :runtime, style: "width: 100%; background: #14181c; color: #fff; border: 1px solid #456; padding: 12px; border-radius: 4px;" %>
+    </div>
+
     <div style="margin-bottom: 30px;">
       <%= f.label :release_date, style: "display: block; color: #678; font-size: 0.7rem; margin-bottom: 8px; text-transform: uppercase;" %>
       <%= f.date_select :release_date, { start_year: 1900, end_year: Date.today.year + 5 }, 
           { style: "background: #14181c; color: #fff; border: 1px solid #456; padding: 5px; border-radius: 4px;" } %>
     </div>
 
-    <div style="display: flex; gap: 15px;">
+    <%# --- Credits Section --- %>
+    <div style="margin-top: 30px; border-top: 1px solid #2c3440; padding-top: 20px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <label style="color: #678; font-size: 0.7rem; text-transform: uppercase;">Cast & Crew</label>
+        <%= link_to "+ CREATE NEW PERSON", new_cast_path, target: "_blank", style: "color: #00e054; font-size: 0.65rem; text-decoration: none;" %>
+      </div>
+
+      <%# Container for Existing and New rows %>
+      <div data-nested-form-target="container">
+        <%= f.fields_for :credits do |cf| %>
+          <%= render "credit_fields", f: cf %>
+        <% end %>
+      </div>
+
+      <%# Add Button %>
+      <button type="button" data-action="nested-form#add" style="background: #2c3440; color: #00e054; border: 1px solid #00e054; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 0.8rem; font-weight: bold; margin-top: 10px;">
+        + ADD CREDIT
+      </button>
+
+      <%# Template for New Rows (Hidden) %>
+      <template data-nested-form-target="template">
+        <%= f.fields_for :credits, movie.credits.build, child_index: "NEW_RECORD" do |cf| %>
+          <%= render "credit_fields", f: cf %>
+        <% end %>
+      </template>
+    </div>
+
+    <%# --- Genres --- %>
+    <div style="margin: 25px 0; border-top: 1px solid #2c3440; padding-top: 20px;">
+      <label style="display: block; color: #678; font-size: 0.7rem; margin-bottom: 10px; text-transform: uppercase;">Genres</label>
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+        <%= f.collection_check_boxes :genre_ids, Genre.all, :id, :name do |b| %>
+          <div style="display: flex; align-items: center; gap: 8px; color: #fff; font-size: 0.8rem;">
+            <%= b.check_box(style: "accent-color: #00e054;") %>
+            <%= b.label %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 15px; margin-top: 30px;">
       <%= f.submit "SAVE MOVIE", style: "background: #00e054; color: #000; border: none; padding: 12px 30px; font-weight: bold; border-radius: 3px; cursor: pointer;" %>
       <%= link_to "CANCEL", movies_path, style: "color: #9ab; text-decoration: none; padding: 12px; font-size: 0.8rem;" %>
     </div>
-  </div>
-  <div style="margin-bottom: 25px;">
-    <label style="display: block; color: #678; font-size: 0.7rem; margin-bottom: 10px; text-transform: uppercase;">Genres</label>
-    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
-      <%= f.collection_check_boxes :genre_ids, Genre.all, :id, :name do |b| %>
-        <div style="display: flex; align-items: center; gap: 8px; color: #fff; font-size: 0.8rem;">
-          <%= b.check_box(style: "accent-color: #00e054;") %>
-          <%= b.label %>
-        </div>
-      <% end %>
-    </div>
-  </div>
-
-  <div style="margin-bottom: 25px; border-top: 1px solid #2c3440; padding-top: 20px;">
-    <label style="display: block; color: #678; font-size: 0.7rem; margin-bottom: 10px; text-transform: uppercase;">Current Cast & Crew</label>
-    <div id="movie-credits" style="color: #fff; font-size: 0.85rem;">
-      <% movie.credits.each do |credit| %>
-        <div style="display: flex; justify-content: space-between; background: #14181c; padding: 8px; border-radius: 4px; margin-bottom: 5px;">
-          <span><strong><%= credit.cast.name %></strong> as <%= credit.job %></span>
-          <%# We would typically use a nested form or a separate delete button here %>
-        </div>
-      <% end %>
-    </div>
-  </div>
-
-  <div style="display: flex; gap: 15px;">
-    <%= f.submit "SAVE MOVIE", style: "background: #00e054; color: #000; border: none; padding: 12px 30px; font-weight: bold; border-radius: 3px; cursor: pointer;" %>
-    <%= link_to "CANCEL", movies_path, style: "color: #9ab; text-decoration: none; padding-top: 10px;" %>
   </div>
 <% end %>

@@ -1,15 +1,15 @@
 class RatingsController < ApplicationController
   def toggle
-    @user = User.second
-    @movie = Movie.find(params[:movie_id])
+
+    @movie = Movie.find(params[:id])
     score = params[:rating].to_i 
 
-    existing_rating = Rating.find_by(user: @user, movie: @movie)
+    existing_rating = Rating.find_by(member: @current_user.actable, movie: @movie)
 
     if existing_rating && (score == 0 || existing_rating.rating == score)
       existing_rating.destroy
     else
-      rating_record = Rating.find_or_initialize_by(user: @user, movie: @movie)
+      rating_record = Rating.find_or_initialize_by(member: @current_user.actable, movie: @movie)
       rating_record.update(rating: score)
     end
 

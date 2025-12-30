@@ -1,19 +1,20 @@
-<%# Access library_entries via the Member identity (actable) %>
-<% entry = nil %>
-<% if user&.actable_type == 'Member' %>
-  <% entry = user.actable.library_entries.find_by(movie: movie) %>
-<% end %>
+<%# 1. Fetch the entry safely via the Member identity %>
+<% entry = (user&.actable_type == 'Member') ? user.actable.library_entries.find_by(movie: movie) : nil %>
 
 <div id="watchlist-section-<%= movie.id %>">
-  <% if entry&.in_watchlist %>
-    <%= button_to "REMOVE FROM WATCHLIST", movie_library_entry_path(movie, entry), 
-        method: :patch, 
-        params: { library_entry: { in_watchlist: false } },
-        style: "background: #cc3333; color: #fff; border: none; padding: 5px 15px; border-radius: 3px; font-weight: bold; cursor: pointer; font-size: 0.7rem;" %>
-  <% elsif user&.actable_type == 'Member' %>
-    <%= button_to "+ WATCHLIST", movie_library_entries_path(movie), 
-        method: :post,
-        params: { in_watchlist: true },
-        style: "background: #456; color: #fff; border: none; padding: 5px 15px; border-radius: 3px; font-weight: bold; cursor: pointer; font-size: 0.7rem;" %>
+  <%# Only Members can have a watchlist %>
+  <% if user&.actable_type == 'Member' %>
+    
+    <%# Using the toggle path: one route for both adding and removing %>
+    <%= button_to toggle_watchlist_movie_path(movie), 
+                  method: :post do %>
+      
+      <%= entry&.in_watchlist ? "✓ In Watchlist" : "+ Watchlist" %>
+      
+    <% end %>
+
+  <% else %>
+    <%# Optional: Show a locked message for Moderators %>
+    <span style="color: #678; font-size: 0.65rem; text-transform: uppercase;">Member Feature</span>
   <% end %>
 </div>

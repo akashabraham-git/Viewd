@@ -1,9 +1,10 @@
 class MoviesController < ApplicationController
+  # Ensure set_movie is called first
   before_action :set_movie, only: [:show, :edit, :update, :destroy]
+  # Check for moderator permissions on admin actions
   before_action :authorize_moderator!, except: [:index, :show]
 
   def index
-    @current_user = User.find(13)
     @query = params[:query]
     @type = params[:type] || "movies" 
 
@@ -17,35 +18,41 @@ class MoviesController < ApplicationController
         @results = Movie.where("title ILIKE ?", "%#{@query}%")
       end
     else
-      @results = Movie.all.limit(20)
+      @results = Movie.all
     end
   end
 
   def show
+    # Error handling if movie is missing (though find usually throws an error)
     if @movie.nil?
-      redirect_to movies_path, alert: "Error: Movie not found."
-      return
+      return redirect_to movies_path, alert: "Error: Movie not found."
     end
 
+    # 1. Fetch Popular Reviews (using member identity)
     @popular_reviews = @movie.reviews
                               .left_joins(:likes)
                               .group(:id)
                               .order('COUNT(likes.id) DESC, reviews.created_at DESC')
                               .limit(3)
-                              .includes(member: { profile_picture_attachment: :blob })
+                              .includes(member: [:user, { profile_picture_attachment: :blob }])
 
+    # 2. Movie Details
     @credits = @movie.credits.includes(:cast)
     @actors = @credits.where(job: 'Actor')
     @crew_groups = @credits.where.not(job: 'Actor').group_by(&:job)
     @genres = @movie.genres
 
+    # 3. Aggregated Stats
     @total_watch = @movie.library_entries.where.not(watched_date: nil).count
     @total_likes = @movie.likes.count
 
-    @user = User.find(13) 
-    if @user.actable_type == 'Member'
-      @library_entry = @user.actable.library_entries.find_by(movie: @movie)
+    # 4. Member-Specific Data
+    # Initialize an empty review for the form (FIXES THE model_name ERROR)
+    if @current_user&.actable_type == 'Member'
+      @review = @movie.reviews.build
+      @library_entry = @current_user.actable.library_entries.find_by(movie: @movie)
     else
+      @review = nil
       @library_entry = nil
     end
   end
@@ -57,6 +64,7 @@ class MoviesController < ApplicationController
   def create
     @movie = Movie.new(movie_params)
     
+    # Associate with the moderator creating the entry
     if @current_user&.actable_type == "Moderator"
       @movie.moderator = @current_user.actable 
     end
@@ -75,7 +83,8 @@ class MoviesController < ApplicationController
     if @movie.update(movie_params)
       redirect_to @movie, notice: "Movie was successfully updated."
     else
-      redirect_back fallback_location: edit_movie_path(@movie), alert: "#{@movie.errors.full_messages.to_sentence}"
+      # Using render :edit is better than redirect_back to preserve error messages
+      render :edit, status: :unprocessable_entity
     end
   end
 
@@ -87,10 +96,15 @@ class MoviesController < ApplicationController
   private
 
   def set_movie
-    @movie = Movie.find(params[:id])
+    # Using find_by here allows us to handle the nil case in the 'show' action
+    @movie = Movie.find_by(id: params[:id])
   end
 
   def movie_params
-    params.require(:movie).permit(:title, :synopsis, :release_date, :poster_url, :runtime, :language, :origin_country)
+    params.require(:movie).permit(
+      :title, :synopsis, :poster_url, :release_date, :origin_country, :runtime, :language,
+      genre_ids: [], 
+      credits_attributes: [:id, :cast_id, :character, :job, :_destroy]
+    )
   end
 end

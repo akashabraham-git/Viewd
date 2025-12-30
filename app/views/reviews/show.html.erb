@@ -27,7 +27,7 @@
       </h2>
 
       <%# USER ROW %>
-      <%= link_to user_path(@review.user), style:"text-decoration:none;display:flex;gap:12px;align-items:center;" do %>
+      <%= link_to user_path(@review.member.user), style:"text-decoration:none;display:flex;gap:12px;align-items:center;" do %>
 
         <div style="display:flex;
                     align-items:center;
@@ -39,8 +39,8 @@
                       border-radius:50%;
                       overflow:hidden;
                       background:#2c3440;">
-            <% if @review.user.actable.profile_picture&.attached? %>
-              <%= image_tag @review.user.actable.profile_picture,
+            <% if @review.member.user.actable.profile_picture&.attached? %>
+              <%= image_tag @review.member.user.actable.profile_picture,
                   style:"width:100%;height:100%;object-fit:cover;" %>
             <% else %>
               <div style="width:100%;height:100%;
@@ -58,7 +58,7 @@
             <p style="margin:0;
                       color:#fff;
                       font-size:0.8rem;">
-              <%= @review.user.name %>
+              <%= @review.member.user.name %>
             </p>
             
             <p style="margin:2px 0 0 0;
@@ -103,9 +103,9 @@
                       align-items:center;
                       gap:5px;" do %>
 
-          <span style="color:<%= @review.likes.exists?(user: @current_user) ? '#ff4b4b' : '#678' %>;
+          <span style="color:<%= @review.likes.exists?(member: @current_user.actable) ? '#ff4b4b' : '#678' %>;
                       font-size:1rem;">
-            <%= @review.likes.exists?(user: @current_user) ? '❤' : '♡' %>
+            <%= @review.likes.exists?(member: @current_user.actable) ? '❤' : '♡' %>
           </span>
 
           <span style="color:#678;
@@ -119,7 +119,7 @@
 
 
         <%# ACTIONS (ONLY OWNER) %>
-        <% if @review.user == @current_user %>
+        <% if @review.member.user == @current_user %>
           <div style="display:flex;gap:10px;">
             <%= link_to "EDIT",
                 edit_movie_review_path(@review.movie, @review),

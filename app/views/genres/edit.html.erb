@@ -1,0 +1,8 @@
+<div style="max-width: 500px; margin: 60px auto; font-family: sans-serif;">
+  <div style="margin-bottom: 30px;">
+    <h1 style="color: #fff; margin: 0; font-size: 1.8rem;">Edit Genre</h1>
+    <p style="color: #678; margin-top: 5px;">Renaming "<%= @genre.name %>" will update all linked movies.</p>
+  </div>
+
+  <%= render 'form', genre: @genre %>
+</div>

@@ -3,7 +3,7 @@ class LibraryEntriesController < ApplicationController
   before_action :set_user
 
   def toggle_watched
-    entry = LibraryEntry.find_or_initialize_by(user: @user, movie: @movie)
+    entry = LibraryEntry.find_or_initialize_by(member: @current_user.actable, movie: @movie)
 
     if entry.watched_date.nil?
       entry.watched_date = Date.today
@@ -11,8 +11,8 @@ class LibraryEntriesController < ApplicationController
       entry.save
       redirect_back fallback_location: movie_path(@movie)
     else
-      has_rating = Rating.exists?(user: @user, movie: @movie)
-      has_review = Review.exists?(user: @user, movie: @movie)
+      has_rating = Rating.exists?(member: @current_user.actable, movie: @movie)
+      has_review = Review.exists?(member: @current_user.actable, movie: @movie)
 
       if has_rating || has_review
         redirect_back fallback_location: movie_path(@movie), alert: "Can't be removed from your films since there's an activity in it."
@@ -24,7 +24,7 @@ class LibraryEntriesController < ApplicationController
   end
 
   def toggle_watchlist
-    entry = LibraryEntry.find_or_initialize_by(user: @user, movie: @movie)
+    entry = LibraryEntry.find_or_initialize_by(member: @current_user.actable, movie: @movie)
     entry.in_watchlist = !entry.in_watchlist
     entry.save
     redirect_back fallback_location: movie_path(@movie)
@@ -33,7 +33,7 @@ class LibraryEntriesController < ApplicationController
   private
 
   def set_movie
-    @movie = Movie.find_by(id: params[:movie_id])
+    @movie = Movie.find_by(id: params[:id])
     if @movie.nil?
       redirect_to movies_path, alert: "Error: Movie not found."
     end

@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-  resources :users
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -11,32 +10,41 @@ Rails.application.routes.draw do
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
 
-resources :movies do
-  member do
-    post 'toggle_watched', to: 'library_entries#toggle_watched'
-    post 'toggle_watchlist', to: 'library_entries#toggle_watchlist'
-    post 'toggle_movie_like', to: 'likes#toggle_movie_like'
-    post 'toggle_rating', to: 'ratings#toggle'
+  root "movies#index"
+
+  resources :movies do
+    member do
+      post :toggle_watched,   to: 'library_entries#toggle_watched'
+      post :toggle_watchlist, to: 'library_entries#toggle_watchlist'
+      post :toggle_movie_like, to: 'likes#toggle_movie_like'
+      post :toggle_rating,     to: 'ratings#toggle'
+    end
+
+    resources :reviews do
+      member do
+        post :toggle_like, to: 'likes#toggle_review_like'
+      end
+    end
+
+    resources :library_entries, only: [:create, :update, :destroy]
   end
 
-  resources :reviews, only: [:create, :edit, :update, :destroy, :index] do
-    post 'toggle_like', to: 'likes#toggle_review_like', on: :member, as: :toggle_like
+  resources :users, hide: [:index]
+
+  resources :members, only: [] do
+    member do
+      get :library
+      get :watchlist
+      get :likes
+      get :reviews
+    end
   end
 
-  resources :library_entries, only: [:create, :update, :destroy]
-end
-
-  get 'users/:id/library', to: 'users#library', as: :library_user
-  get 'users/:id/watchlist', to: 'users#watchlist', as: :watchlist_user
-  get 'users/:id/likes', to: 'users#likes', as: :user_likes
-  get 'users/:id/reviews', to: 'users#reviews', as: :user_reviews
-
-  resources :users, only: [:show, :edit, :update, :destroy]
-  resources :favorites, only: [:create, :destroy]
-  resources :connections, only: [:index, :create, :destroy]
   resources :casts
-  resources :reviews, only: [:show, :create, :edit, :destroy]
+  resources :genres
   resources :memberships, only: [:index, :update]
-    
-    root "movies#index"
+  resources :connections,   only: [:index, :create, :destroy]
 end
+
+
+

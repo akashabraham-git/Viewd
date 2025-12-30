@@ -1,0 +1,23 @@
+<div style="max-width: 800px; margin: 40px auto; font-family: sans-serif;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; border-bottom: 1px solid #2c3440; padding-bottom: 20px;">
+    <h1 style="color: #fff; margin: 0;">Manage Genres</h1>
+    <%= link_to "+ ADD GENRE", new_genre_path, 
+        style: "background: #00e054; color: #000; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 0.8rem;" %>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+    <% @genres.each do |genre| %>
+      <div style="background: #1a2129; padding: 15px; border-radius: 8px; border: 1px solid #2c3440; display: flex; justify-content: space-between; align-items: center;">
+        <%= link_to genre.name, genre_path(genre), 
+      style: "background: #2c3440; color: #fff; padding: 4px 10px; border-radius: 3px; text-decoration: none; font-size: 0.75rem; border: 1px solid #456;" %>
+        
+        <div style="display: flex; gap: 10px;">
+          <%= link_to "Edit", edit_genre_path(genre), style: "color: #9ab; font-size: 0.7rem; text-decoration: none;" %>
+          <%= button_to "Delete", genre_path(genre), method: :delete, 
+              form: { data: { turbo_confirm: "Delete #{genre.name} and remove it from all movies?" } },
+              style: "background: none; border: none; color: #ff4b4b; font-size: 0.7rem; cursor: pointer;" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

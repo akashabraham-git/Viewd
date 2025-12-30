@@ -1,44 +1,41 @@
 class LikesController < ApplicationController
   before_action :set_movie
-  before_action :set_user
 
   def toggle_movie_like
-    like = Like.find_by(likeable: @movie, user: @user)
+    like = @movie.likes.find_by(member: @current_user.actable)
+
     if like 
       like.destroy
     else
-      Like.create(likeable: @movie, user: @user)
+      @movie.likes.create!(member: @current_user.actable)
     end
+    
     redirect_back fallback_location: movie_path(@movie)
   end
   
   def toggle_review_like
     @review = Review.find(params[:id])
-    @like = @review.likes.find_by(user: @user)
+    @like = @review.likes.find_by(member: @current_user.actable)
 
     if @like
       @like.destroy
     else
-      @review.likes.create(user: @user)
+      @review.likes.create(member: @current_user.actable)
     end
 
-    redirect_back fallback_location: root_path
+    redirect_back fallback_location: movie_path(@movie)
   end
 
   private
 
   def set_movie
-    @movie = Movie.find_by(id: params[:movie_id])
+    movie_id = params[:movie_id] || params[:id]
+    @movie = Movie.find_by(id: movie_id)
+
     if @movie.nil?
       redirect_to movies_path, alert: "Error: Movie not found."
     end
   end
 
-  def set_user
-    @user = User.second
-    if @user.nil?
-      redirect_to movies_path, alert: "Please log in to enter activity"
-    end
-  end
 
 end

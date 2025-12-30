@@ -3,7 +3,7 @@
   <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #2c3440; padding-bottom: 15px; margin-bottom: 30px;">
     <div>
       <h4 style="color: #678; margin: 0; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase;">Watchlist</h4>
-      <h1 style="color: #fff; margin: 5px 0 0 0; font-size: 1.5rem;"><%= @user.name %> wants to see...</h1>
+      <h1 style="color: #fff; margin: 5px 0 0 0; font-size: 1.5rem;"><%= @member.user.name %> wants to see...</h1>
     </div>
     <span style="color: #678; font-size: 0.9rem;"><%= pluralize(@entries.count, "movie") %></span>
   </div>

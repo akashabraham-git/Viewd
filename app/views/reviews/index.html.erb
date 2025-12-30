@@ -27,7 +27,7 @@
                cursor: pointer;">
 
         <%# AVATAR (PROFILE LINK) %>
-        <%= link_to user_path(review.user),
+        <%= link_to user_path(review.member.user),
             onclick: "event.stopPropagation();",
             style: "text-decoration:none; flex-shrink:0;" do %>
 
@@ -36,8 +36,8 @@
                       border-radius: 50%;
                       overflow: hidden;
                       border: 1px solid #456;">
-            <% if review.user.actable.profile_picture&.attached? %>
-              <%= image_tag review.user.actable.profile_picture,
+            <% if review.member.user.actable.profile_picture&.attached? %>
+              <%= image_tag review.member.user.actable.profile_picture,
                   style: "width:100%; height:100%; object-fit:cover;" %>
             <% else %>
               <div style="display:flex;
@@ -57,7 +57,7 @@
                       align-items: flex-start;">
 
             <%# NAME + USERNAME + STARS (PROFILE LINK) %>
-            <%= link_to user_path(review.user),
+            <%= link_to user_path(review.member.user),
                 onclick: "event.stopPropagation();",
                 style: "text-decoration:none;" do %>
 
@@ -65,14 +65,14 @@
                 <span style="color: #fff;
                              font-weight: bold;
                              font-size: 1.1rem;">
-                  <%= review.user.name %>
+                  <%= review.member.user.name %>
                 </span>
 
                 <span style="color:#678; font-size:0.85rem;">
-                  @<%= review.user.username %>
+                  @<%= review.member.user.username %>
                 </span>
 
-                <% rating = Rating.find_by(user: review.user, movie: @movie) %>
+                <% rating = Rating.find_by(user: review.member.user, movie: @movie) %>
                 <% if rating %>
                   <div style="display:flex; gap:2px; margin-left:5px;">
                     <% rating.rating.times do %>
@@ -103,9 +103,9 @@
                             align-items:center;
                             gap:5px;" do %>
 
-                <span style="color:<%= review.likes.exists?(user: @user) ? '#ff4b4b' : '#678' %>;
+                <span style="color:<%= review.likes.exists?(member: @current_user.actable) ? '#ff4b4b' : '#678' %>;
                              font-size:1rem;">
-                  <%= review.likes.exists?(user: @user) ? '❤' : '♡' %>
+                  <%= review.likes.exists?(member: @current_user.actable) ? '❤' : '♡' %>
                 </span>
 
                 <span style="color:#678;
@@ -126,7 +126,7 @@
             <%= simple_format review.content %>
           </div>
 
-          <% if review.user == @user %>
+          <% if review.member.user == @user %>
             <div style="display:flex;
                         gap:15px;
                         margin-top:15px;

@@ -1,6 +1,6 @@
 <div style="max-width: 1000px; margin: 0 auto; color: #9ab; font-family: sans-serif;">
   
-  <% if @current_user&.actable_type == 'Moderator' %>
+  <% if @current_user&.actable_type == 'Moderator' && !@query.present?%>
     <div style="background: #1a2129; border: 1px solid #ffd700; padding: 20px; border-radius: 8px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
       <div>
         <h3 style="color: #ffd700; margin: 0; font-size: 0.9rem; text-transform: uppercase;">Movie Management</h3>
@@ -33,8 +33,6 @@
       <% @results.each do |user| %>
         <%= link_to user_path(user), style: "text-decoration: none; color: inherit;" do %>
           <div style="background: #1a2129; padding: 20px; border-radius: 8px; text-align: center; border: 1px solid #2c3440; transition: border 0.2s;">
-            
-            <%# Polymorphic Picture Check: Only Members have profile pictures %>
             <% if user.actable_type == 'Member' && user.actable.profile_picture&.attached? %>
               <%= image_tag user.actable.profile_picture, 
                   style: "width: 70px; height: 70px; background: #2c3440; border-radius: 50%; margin: 0 auto 15px; border: 2px solid #fff; object-fit: cover; display: block;" %>
@@ -43,7 +41,6 @@
                 👤
               </div>
             <% end %>
-
             <strong style="color: #fff; display: block;"><%= user.name %></strong>
             <small style="color: rgba(180, 188, 195, 1);">@<%= user.username %></small>
           </div>
@@ -53,20 +50,32 @@
     <%# CAST RESULTS %>
     <% elsif @type == "cast" %>
       <% @results.each do |person| %>
-        <%= link_to cast_path(person), style: "text-decoration: none; color: inherit;" do %>
-          <div style="text-align: center; background: #1a2129; padding: 15px; border-radius: 8px; border: 1px solid #2c3440;">
-            <div style="width: 80px; height: 80px; background: #2c3440; border-radius: 50%; margin: 0 auto 10px; border: 1px solid #456; overflow: hidden;">
-              <%= image_tag person.pic, style: "width: 100%; height: 100%; object-fit: cover;" if person.pic.present? %>
+        <div style="display: flex; flex-direction: column;">
+          <%= link_to cast_path(person), style: "text-decoration: none; color: inherit;" do %>
+            <div style="text-align: center; background: #1a2129; padding: 15px; border-radius: 8px; border: 1px solid #2c3440;">
+              <div style="width: 80px; height: 80px; background: #2c3440; border-radius: 50%; margin: 0 auto 10px; border: 1px solid #456; overflow: hidden;">
+                <%= image_tag person.pic, style: "width: 100%; height: 100%; object-fit: cover;" if person.pic.present? %>
+              </div>
+              <strong style="color: #fff; display: block; font-size: 0.9rem;"><%= person.name %></strong>
             </div>
-            <strong style="color: #fff; display: block; font-size: 0.9rem;"><%= person.name %></strong>
-          </div>
-        <% end %>
+          <% end %>
+          
+          <%# MODERATOR ACTIONS PER CAST MEMBER %>
+          <% if @current_user&.actable_type == 'Moderator' %>
+            <div style="display: flex; gap: 10px; margin-top: 10px; justify-content: center;">
+              <%= link_to "EDIT", edit_cast_path(person), style: "font-size: 0.6rem; color: #9ab; text-decoration: none; border: 1px solid #456; padding: 2px 8px; border-radius: 3px;" %>
+              <%= button_to "DEL", cast_path(person), method: :delete, 
+                  form: { data: { turbo_confirm: "Delete #{person.name}?" } },
+                  style: "font-size: 0.6rem; color: #ff4b4b; background: none; border: 1px solid #ff4b4b; padding: 2px 8px; border-radius: 3px; cursor: pointer;" %>
+            </div>
+          <% end %>
+        </div>
       <% end %>
 
     <%# MOVIE RESULTS %>
     <% else %>
       <% @results.each do |movie| %>
-        <div style="display: flex; flex-direction: column; position: relative;">
+        <div style="display: flex; flex-direction: column;">
           <%= link_to movie_path(movie), style: "text-decoration: none; color: inherit;" do %>
             <div style="aspect-ratio: 2/3; overflow: hidden; border-radius: 4px; border: 1px solid #2c3440; transition: border 0.2s;">
               <% if movie.poster_url.present? %>
@@ -81,10 +90,10 @@
           <%# MODERATOR ACTIONS PER MOVIE %>
           <% if @current_user&.actable_type == 'Moderator' %>
             <div style="display: flex; gap: 10px; margin-top: 5px;">
-              <%= link_to "EDIT", edit_movie_path(movie), style: "font-size: 0.65rem; color: #9ab; text-decoration: none; border: 1px solid #456; padding: 2px 6px; border-radius: 2px;" %>
+              <%= link_to "EDIT", edit_movie_path(movie), style: "font-size: 0.6rem; color: #9ab; text-decoration: none; border: 1px solid #456; padding: 2px 8px; border-radius: 3px;" %>
               <%= button_to "DEL", movie_path(movie), method: :delete, 
-                  form: { data: { turbo_confirm: 'Delete this movie permanently?' } },
-                  style: "font-size: 0.65rem; color: #ff4b4b; background: none; border: 1px solid #ff4b4b; padding: 2px 6px; border-radius: 2px; cursor: pointer;" %>
+                  form: { data: { turbo_confirm: "Permanently delete #{movie.title}?" } },
+                  style: "font-size: 0.6rem; color: #ff4b4b; background: none; border: 1px solid #ff4b4b; padding: 2px 8px; border-radius: 3px; cursor: pointer;" %>
             </div>
           <% end %>
         </div>

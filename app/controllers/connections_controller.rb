@@ -6,10 +6,10 @@ class ConnectionsController < ApplicationController
     @type = params[:type]
     
     if @type == "following"
-      @users = @user.following
+      @users = @user.actable.following
     else
       if @type == "followers"
-        @users = @user.followers
+        @users = @user.actable.followers
       else
         redirect_to user_path(@user), alert: "Invalid operation"
       end
@@ -19,7 +19,7 @@ class ConnectionsController < ApplicationController
   def create
     @target_user = User.find(params[:following_id])
 
-    Connection.find_or_create_by(follower: @me, following: @target_user)
+    Connection.find_or_create_by(follower: @me.actable, following: @target_user.actable)
     redirect_back fallback_location: user_path(@target_user)
   end
 

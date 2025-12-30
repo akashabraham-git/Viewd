@@ -5,7 +5,7 @@
     <div style="border-bottom: 1px solid #2c3440; padding-bottom: 10px; margin-bottom: 20px;">
       <h2 style="color: #9ab; font-size: 13px; text-transform: uppercase; letter-spacing: 1.2px; margin: 0;">Reviews of</h2>
       <h1 style="color: #fff; font-size: 26px; margin: 5px 0; font-family: serif; font-weight: bold;">
-        <%= @user.name %> 
+        <%= @member.user.name %> 
       </h1>
     </div>
 
@@ -14,7 +14,7 @@
       <div style="display: flex; flex-direction: column;">
         <% @reviews.each do |review| %>
 
-          <div onclick="window.location='<%= review_path(review) %>'"
+          <div onclick="window.location='<%= movie_review_path(review.movie, review) %>'"
                style="display: flex; gap: 20px; padding-bottom: 25px; margin-bottom: 25px; border-bottom: 1px solid #2c3440; cursor: pointer;">
             
             <div style="flex-shrink: 0;">
@@ -36,9 +36,9 @@
 
               <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
                 <span style="color: #00e054; font-size: 16px; letter-spacing: 1px;">
-                  <%# Example logic for stars %>
-                  <%@rating = Rating.find_by(user: review.user, movie: review.movie).rating%>
-                  <%= "★" * (@rating || 0) %>
+                  <% user_rating = Rating.find_by(member: review.member, movie: review.movie)%>
+                  <% rating_value = user_rating&.rating || 0 %>
+                  <%= "★" * (rating_value || 0) %>
                 </span>
                 
                 <span style="color: #678; font-size: 13px;">
@@ -55,7 +55,7 @@
                       method: :post, onclick: "event.stopPropagation();",
                       style: "background:none; border:none; cursor:pointer; padding:0; display:inline-flex; align-items:center; gap:6px;" do %>
                   
-                  <span style="color: <%= review.likes.exists?(user: @current_user) ? '#ff8000' : '#678' %>; font-size: 14px;">
+                  <span style="color: <%= review.likes.exists?(member: member) ? '#ff8000' : '#678' %>; font-size: 14px;">
                     ❤
                   </span>
                   <span style="color: #678; font-size: 13px;">
@@ -63,7 +63,7 @@
                   </span>
                 <% end %>
 
-                <% if @current_user == @user %>
+                <% if @current_user == @member.user %>
                   <div style="display: flex; gap: 10px; margin-left: auto;">
                     <%= link_to "Edit", edit_movie_review_path(review.movie, review), 
                         onclick: "event.stopPropagation();",

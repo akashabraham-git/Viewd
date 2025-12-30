@@ -1,0 +1,25 @@
+<div class="nested-form-wrapper" data-new-record="<%= f.object.new_record? %>" style="display: grid; grid-template-columns: 2fr 2fr 1.5fr 40px; gap: 10px; margin-bottom: 10px; align-items: center;">
+  
+  <%# 1. Person Selection %>
+  <%= f.collection_select :cast_id, Cast.order(:name), :id, :name, { prompt: "Select Person" }, 
+      { style: "width: 100%; background: #14181c; color: #fff; border: 1px solid #456; padding: 8px; border-radius: 4px;" } %>
+
+  <%# 2. Character Input %>
+  <%= f.text_field :character, placeholder: "Character Name", 
+      style: "width: 100%; background: #14181c; color: #fff; border: 1px solid #456; padding: 8px; border-radius: 4px;" %>
+
+  <%# 3. Job Datalist %>
+  <%= f.text_field :job, list: "job-list", placeholder: "Actor/Director...", 
+      style: "width: 100%; background: #14181c; color: #fff; border: 1px solid #456; padding: 8px; border-radius: 4px;" %>
+
+  <%# Hidden Destroy Field %>
+  <%= f.hidden_field :_destroy %>
+  
+  <button type="button" data-action="nested-form#remove" style="background: none; border: none; color: #ff4b4b; cursor: pointer; font-size: 1.2rem;">&times;</button>
+  
+  <datalist id="job-list">
+    <% Credit.pluck(:job).uniq.compact.each do |job| %>
+      <option value="<%= job %>">
+    <% end %>
+  </datalist>
+</div>

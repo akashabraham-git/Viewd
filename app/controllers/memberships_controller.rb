@@ -1,5 +1,4 @@
 class MembershipsController < ApplicationController
-  before_action :set_user
   def index
     @country = @user.country || "usa"
     @tiers = MembershipTier.where(country: @country).where.not(name: "Free")
@@ -21,9 +20,4 @@ class MembershipsController < ApplicationController
       redirect_to memberships_path, alert: "Update failed."
     end
   end
-
-  def set_user
-    @user = User.second
-  end
-
 end

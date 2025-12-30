@@ -8,8 +8,7 @@ class User < ApplicationRecord
 
   before_validation :normalize_username, :normalize_email
   before_create :normalize_name
-  after_create :create_default_membership 
-  after_commit :send_welcome_email #will send while updating also, fix it
+  after_commit :send_welcome_email, on: :create
 
 
   def normalize_username
@@ -22,16 +21,6 @@ class User < ApplicationRecord
 
   def normalize_name
     self.name = name.squish.titleize if name.present?
-  end
-
-  def create_default_membership
-    if self.actable_type == "Member"
-      tier = MembershipTier.find_by(name: 'Free', country: self.country)
-      if tier.nil?
-        tier = MembershipTier.find_by(name: 'Free', country: :unknown)
-      end
-      create_membership(membership_tier: tier, status: :active)
-    end
   end
 
   def send_welcome_email

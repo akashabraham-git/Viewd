@@ -1,4 +1,4 @@
-<%= form_with(model: [movie, movie.reviews.build], local: true, style: "background: #1a2129; padding: 20px; border-radius: 4px; border: 1px solid #2c3440;") do |f| %>
+<%= form_with(model: [@movie, @review], local: true, style: "background: #1a2129; padding: 20px; border-radius: 4px; border: 1px solid #2c3440;") do |f| %>
   <div style="margin-bottom: 15px;">
     <label style="display: block; color: #678; font-size: 0.7rem; letter-spacing: 1px; margin-bottom: 8px; text-transform: uppercase;">
       Add a review...

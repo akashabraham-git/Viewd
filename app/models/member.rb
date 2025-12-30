@@ -26,6 +26,15 @@ class Member < ApplicationRecord
   }
 
   validates :bio, length: { maximum: 500 }
+  
+  after_create :assign_default_membership
+
+  def assign_default_membership
+    tier = MembershipTier.find_by(name: 'Free', country: :unknown)
+    if tier
+      create_membership(membership_tier: tier, status: :active)
+    end
+  end
 
   def following?(other_user)
     following.include?(other_user)

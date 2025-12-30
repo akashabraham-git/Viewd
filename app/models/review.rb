@@ -1,7 +1,7 @@
 class Review < ApplicationRecord
   include Watchable
 
-  belongs_to :user
+  belongs_to :member
   belongs_to :movie
   has_many :likes, as: :likeable
 

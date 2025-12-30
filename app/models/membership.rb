@@ -1,5 +1,5 @@
 class Membership < ApplicationRecord
-  belongs_to :user
+  belongs_to :member
   belongs_to :membership_tier
 
   enum :status, { active: 0, cancelled: 1, expired: 2 }

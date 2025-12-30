@@ -1,23 +1,22 @@
 class ReviewsController < ApplicationController
-  before_action :set_movie, only: [:index, :create, :edit]
-  before_action :set_review, only: [:edit, :update, :destroy]
-  before_action :set_current_user, only: [:index, :show, :create]
+  before_action :set_movie 
+  before_action :set_review, only: [:show, :edit, :update, :destroy]
 
   def index
     @reviews = @movie.reviews
                      .left_joins(:likes)
                      .group(:id)
                      .order('COUNT(likes.id) DESC, reviews.created_at DESC')
-                     .includes(user: { profile_picture_attachment: :blob })
+                     .includes(member: { profile_picture_attachment: :blob })
   end
 
   def show
-    @review = Review.includes(:movie, :user).find(params[:id])
-    @rating = Rating.find_by(user: @review.user, movie: @review.movie)&.rating
+    @review = Review.includes(:movie, :member).find(params[:id])
+    @rating = Rating.find_by(member: @review.member, movie: @review.movie)&.rating
   end
 
   def create
-    @review = Review.new(review_params.merge(movie: @movie, user: @current_user))
+    @review = Review.new(review_params.merge(movie: @movie, member: @current_user.actable))
     if @review.save
       redirect_to movie_path(@movie)
     else
@@ -54,10 +53,7 @@ class ReviewsController < ApplicationController
 
   def set_review
     @review = Review.find(params[:id])
-  end
-
-  def set_current_user
-    @current_user = User.second
+    @movie = @review.movie
   end
 
   def review_params

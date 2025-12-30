@@ -1,19 +1,20 @@
-<%# Access likes via the Member identity since user_id was replaced by member_id %>
-<% liked = false %>
-<% if user&.actable_type == 'Member' %>
-  <% liked = user.actable.likes.exists?(likeable: movie) %>
-<% end %>
+<% liked = (user&.actable_type == 'Member') && user.actable.likes.exists?(likeable: movie) %>
 
 <div id="like-section-<%= movie.id %>">
-  <% if liked %>
-    <%= button_to movie_toggle_like_path(movie), method: :post, remote: true, style: "background: none; border: none; cursor: pointer;" do %>
-      <span style="color: #ff8000; font-size: 1.5rem;">♥</span>
+  <% if user&.actable_type == 'Member' %>
+    
+    <%= button_to toggle_movie_like_movie_path(movie), 
+                  method: :post, 
+                  remote: true, 
+                  style: "background: none; border: none; cursor: pointer; padding: 0;" do %>
+      <%# Toggle icon and color based on 'liked' variable %>
+      <span style="color: <%= liked ? '#ff8000' : '#456' %>; font-size: 1.5rem;">
+        <%= liked ? '♥' : '♡' %>
+      </span>
     <% end %>
-  <% elsif user&.actable_type == 'Member' %>
-    <%= button_to movie_toggle_like_path(movie), method: :post, remote: true, style: "background: none; border: none; cursor: pointer;" do %>
-      <span style="color: #456; font-size: 1.5rem;">♡</span>
-    <% end %>
+
   <% else %>
-     <span style="color: #2c3440; font-size: 1.5rem;">♡</span>
+    <%# Non-member/Logged out view %>
+    <span style="color: #2c3440; font-size: 1.5rem; cursor: default;">♡</span>
   <% end %>
 </div>
