@@ -22,12 +22,16 @@
       
       <%= link_to "Cast", movies_path(query: @query, type: "cast"), 
           style: "text-decoration: none; color: #{@type == 'cast' ? '#fff' : '#678'}; border-bottom: #{@type == 'cast' ? '2px solid #00e054' : 'none'}; padding-bottom: 10px;" %>
+      
+      <%= link_to "Genres", movies_path(query: @query, type: "genres"), 
+          style: "text-decoration: none; color: #{@type == 'genres' ? '#fff' : '#678'}; border-bottom: #{@type == 'users' ? '2px solid #00e054' : 'none'}; padding-bottom: 10px;" %>
+      
     </div>
   <% end %>
 
-  <%# RESULTS GRID %>
+ <%# RESULTS GRID %>
   <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 25px;">
-    
+
     <%# USER RESULTS %>
     <% if @type == "users" %>
       <% @results.each do |user| %>
@@ -59,7 +63,7 @@
               <strong style="color: #fff; display: block; font-size: 0.9rem;"><%= person.name %></strong>
             </div>
           <% end %>
-          
+
           <%# MODERATOR ACTIONS PER CAST MEMBER %>
           <% if @current_user&.actable_type == 'Moderator' %>
             <div style="display: flex; gap: 10px; margin-top: 10px; justify-content: center;">
@@ -72,7 +76,25 @@
         </div>
       <% end %>
 
-    <%# MOVIE RESULTS %>
+    <%# GENRE RESULTS %>
+    <% elsif @type == "genres" %>
+      <% @results.each do |genre| %>
+        <div style="background: #1a2129; padding: 15px; border-radius: 8px; border: 1px solid #2c3440; display: flex; justify-content: space-between; align-items: center;">
+          <%= link_to genre.name, genre_path(genre), 
+              style: "background: #2c3440; color: #fff; padding: 4px 10px; border-radius: 3px; text-decoration: none; font-size: 0.75rem; border: 1px solid #456;" %>
+
+          <% if @current_user&.actable_type == "Moderator" %>
+            <div style="display: flex; gap: 10px;">
+              <%= link_to "Edit", edit_genre_path(genre), style: "color: #9ab; font-size: 0.7rem; text-decoration: none;" %>
+              <%= button_to "Delete", genre_path(genre), method: :delete, 
+                  form: { data: { turbo_confirm: "Delete #{genre.name} and remove it from all movies?" } },
+                  style: "background: none; border: none; color: #ff4b4b; font-size: 0.7rem; cursor: pointer;" %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+
+    <%# MOVIE RESULTS (DEFAULT) %>
     <% else %>
       <% @results.each do |movie| %>
         <div style="display: flex; flex-direction: column;">
@@ -99,6 +121,7 @@
         </div>
       <% end %>
     <% end %>
+
   </div>
 
   <% if @results.empty? %>

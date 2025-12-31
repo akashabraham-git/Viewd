@@ -22,14 +22,13 @@ class UsersController < ApplicationController
                    .order('COUNT(likes.id) DESC')
                    .limit(3)
                    .includes(:movie)
-    elsif @user.actable_type == 'Moderator'
-      @managed_movies = @user.actable.managed_movies.limit(10)
     end
 
     @all_movies = Movie.order(:title)
   end
 
   def edit
+    @user.build_actable if @user.actable.nil? && @user.actable_type == 'Member'
     redirect_to root_path, alert: "Unauthorized" unless @user == @current_user
   end
 
@@ -40,12 +39,11 @@ class UsersController < ApplicationController
     end
 
     if @user.update(user_params)
-      if @user.actable_type == "Member" && params[:user][:profile_picture].present?
-        @user.actable.profile_picture.attach(params[:user][:profile_picture])
-      end
+
       
       redirect_to user_path(@user), notice: "Profile updated successfully."
     else
+      flash.now[:alert] =  @user.errors.full_messages.to_sentence
       render :edit, status: :unprocessable_entity
     end
   end
@@ -69,6 +67,9 @@ class UsersController < ApplicationController
 
   
   def user_params
-    params.require(:user).permit(:name, :bio, :profile_picture, :username, :email)
+    params.require(:user).permit(
+      :name, :email, :username,
+      actable_attributes: [:id, :bio, :profile_picture]
+    )
   end
 end

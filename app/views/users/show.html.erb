@@ -86,8 +86,8 @@
       <% else %> 
         <%# Followers logic usually requires current_user to be a Member too %>
         <% if @current_user&.actable_type == "Member" %>
-          <% if @current_user.actable.following.include?(@user) %> 
-            <%= button_to "Unfollow", connection_path(@user.actable), method: :delete, class: "btn-unfollow", style: "background: #e14f4fff; color: #000; border: none; padding: 6px 14px; border-radius: 3px; font-weight: bold; cursor: pointer;" %> 
+          <% if @current_user&.actable.following.include?(@user.actable) %> 
+            <%= button_to "Unfollow", connection_path(@user.id), method: :delete, class: "btn-unfollow", style: "background: #e14f4fff; color: #000; border: none; padding: 6px 14px; border-radius: 3px; font-weight: bold; cursor: pointer;" %> 
           <% else %> 
             <%= button_to "Follow", connections_path(following_id: @user.id), method: :post, class: "btn-follow", style: "background: #00e054; color: #000; border: none; padding: 6px 14px; border-radius: 3px; font-weight: bold; cursor: pointer;" %> 
           <% end %>
@@ -106,8 +106,8 @@
 
     <div style="display:flex;gap:40px;">
       <div style="flex:2;">
-        <% if @user.bio.present? %>
-          <p style="margin-bottom:30px; color: #fff; line-height: 1.5;"><%= @user.bio %></p>
+        <% if @user.actable.bio.present? %>
+          <p style="margin-bottom:30px; color: #fff; line-height: 1.5;"><%= @user.actable.bio %></p>
         <% end %>
 
         <%# FAVORITES - Pulled from User record data %>

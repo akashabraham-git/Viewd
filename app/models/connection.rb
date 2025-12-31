@@ -1,6 +1,6 @@
 class Connection < ApplicationRecord
-  belongs_to :follower, class_name: "User"
-  belongs_to :following, class_name: "User"
+  belongs_to :follower, class_name: "Member"
+  belongs_to :following, class_name: "Member"
 
   validate :cannot_follow_self
 
@@ -9,7 +9,7 @@ class Connection < ApplicationRecord
   private
 
   def notify_connection
-    puts "#{follower.username} just started following #{following.username}!"
+    puts "#{follower.user.username} just started following #{following.user.username}!"
   end
 
   def cannot_follow_self

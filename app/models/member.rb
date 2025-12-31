@@ -36,8 +36,5 @@ class Member < ApplicationRecord
     end
   end
 
-  def following?(other_user)
-    following.include?(other_user)
-  end
 
 end

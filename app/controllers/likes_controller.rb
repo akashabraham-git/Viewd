@@ -15,12 +15,15 @@ class LikesController < ApplicationController
   
   def toggle_review_like
     @review = Review.find(params[:id])
-    @like = @review.likes.find_by(member: @current_user.actable)
+
+    redirect_back fallback_location: movie_path(@movie), alert: "sign in for liking" unless @current_user 
+    return
+    @like = @review.likes.find_by(member: @current_user&.actable)
 
     if @like
       @like.destroy
     else
-      @review.likes.create(member: @current_user.actable)
+      @review.likes.create(member: @current_user&.actable)
     end
 
     redirect_back fallback_location: movie_path(@movie)

@@ -1,6 +1,12 @@
 class User < ApplicationRecord
+  # Include default devise modules. Others available are:
+  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
+  devise :database_authenticatable, :registerable,
+         :recoverable, :rememberable, :validatable
+
   belongs_to :actable, polymorphic: true
   delegate :bio, :country, to: :actable, allow_nil: true
+  accepts_nested_attributes_for :actable
 
   validates :username, presence: true, uniqueness: true, length: {minimum: 3, maximum: 20}, format: {with: /\A[a-zA-Z0-9_.]+\z/}
   validates :email, presence: true, uniqueness: true, format: {with: URI::MailTo::EMAIL_REGEXP}
@@ -9,7 +15,7 @@ class User < ApplicationRecord
   before_validation :normalize_username, :normalize_email
   before_create :normalize_name
   after_commit :send_welcome_email, on: :create
-
+  before_validation :ensure_member_identity, on: :create
 
   def normalize_username
     self.username = username.downcase.strip if username.present?
@@ -25,6 +31,17 @@ class User < ApplicationRecord
 
   def send_welcome_email
     puts "Welcome mail sent to #{email}"
+  end
+
+  def actable_attributes=(attributes)
+    if self.actable_type.nil? || self.actable_type == 'Member'
+      self.actable ||= Member.new
+      self.actable.assign_attributes(attributes)
+    end
+  end
+
+  def build_member_identity
+    self.actable ||= Member.new if self.actable_type.nil? || self.actable_type == 'Member'
   end
 
 end

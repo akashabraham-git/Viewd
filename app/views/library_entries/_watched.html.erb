@@ -5,7 +5,6 @@
 <div id="watched-section-<%= movie.id %>">
   <% if user&.actable_type == 'Member' %>
     
-    <%# Using the toggle path for watched status %>
     <%= button_to toggle_watched_movie_path(movie), 
         method: :post do %>
                 
@@ -14,7 +13,6 @@
     <% end %>
 
   <% else %>
-    <%# Non-members (Moderators) see a disabled-style hint %>
     <span style="color: #456; font-size: 0.7rem; font-style: italic;">Log unavailable</span>
   <% end %>
 </div>

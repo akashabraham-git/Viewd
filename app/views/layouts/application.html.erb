@@ -27,10 +27,14 @@
         <%= form_with url: movies_path, method: :get, local: true do |f| %>
           <%= f.text_field :query, value: params[:query], placeholder: "Search", style: "background: #2c3440; border: none; border-radius: 20px; padding: 8px 15px; color: white; width: 250px;" %>
         <% end %>
-        <% if @current_user %>
-          <%= link_to user_path(@current_user), style: "text-decoration: none; color: #fff; font-weight: bold;" do %>
-            Profile
-          <% end %>
+        <% if user_signed_in? %>
+          <%# Link to the Profile %>
+          <%= link_to "Profile", user_path(current_user), style: "color: #fff; margin-right: 20px;" %>
+          <%= link_to "Logout", destroy_user_session_path, data: { turbo_method: :delete }, style: "color: #678;" %>
+        <% else %>
+          <%# Link to our custom login gateway %>
+          <%= link_to "Login", new_user_session_path, style: "color: #00e054; font-weight: bold;" %>
+          <%= link_to "Sign Up", new_user_registration_path, style: "color: #fff; margin-left: 15px;" %>
         <% end %>
       </div>
     </nav>

@@ -45,7 +45,7 @@
           </ul>
 
           <%# Buy Button %>
-          <%= button_to membership_path(@user.actable.membership, membership_tier_id: tier.id), 
+          <%= button_to membership_path(@current_user.actable.membership, membership_tier_id: tier.id), 
               method: :patch, 
               style: "width: 100%; background: #00e054; color: #000; border: none; padding: 15px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px;" do %>
             Upgrade to <%= tier.name %>
@@ -57,6 +57,6 @@
 
   <%# --- FOOTER LINK --- %>
   <div style="margin-top: 50px; text-align: center;">
-    <%= link_to "NO THANKS, TAKE ME BACK", user_path(@user), style: "color: #678; text-decoration: none; font-size: 0.8rem; letter-spacing: 1px; font-weight: bold;" %>
+    <%= link_to "NO THANKS, TAKE ME BACK", user_path(@current_user), style: "color: #678; text-decoration: none; font-size: 0.8rem; letter-spacing: 1px; font-weight: bold;" %>
   </div>
 </div>

@@ -1,12 +1,12 @@
 class MembershipsController < ApplicationController
   def index
-    @country = @user.country || "usa"
+    @country = @current_user.country || "unknown"
     @tiers = MembershipTier.where(country: @country).where.not(name: "Free")
   end
 
   def update
     @tier = MembershipTier.find(params[:membership_tier_id])
-    @membership = @user.membership
+    @membership = @current_user.actable.membership
 
     if @membership.update(
       membership_tier: @tier,
@@ -15,7 +15,7 @@ class MembershipsController < ApplicationController
       expires_at: 1.month.from_now,
       transaction_id: rand(100000..999999)
     )
-      redirect_to user_path(@user)
+      redirect_to user_path(@current_user)
     else
       redirect_to memberships_path, alert: "Update failed."
     end

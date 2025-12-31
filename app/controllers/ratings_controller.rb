@@ -10,6 +10,7 @@ class RatingsController < ApplicationController
       existing_rating.destroy
     else
       rating_record = Rating.find_or_initialize_by(member: @current_user.actable, movie: @movie)
+      rating_record.current_user_instance = current_user
       rating_record.update(rating: score)
     end
 

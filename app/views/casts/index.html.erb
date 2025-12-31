@@ -6,7 +6,6 @@
       <p style="font-size: 0.8rem; color: #678; margin-top: 5px;">Database of actors, directors, and creators.</p>
     </div>
     
-    <%# ONLY SHOW ADD OPTION TO MODERATORS %>
     <% if @current_user&.actable_type == 'Moderator' %>
       <%= link_to "+ ADD PERSON", new_cast_path, 
           style: "background: #00e054; color: #000; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 0.8rem;" %>

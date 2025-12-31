@@ -17,6 +17,7 @@ class ReviewsController < ApplicationController
 
   def create
     @review = Review.new(review_params.merge(movie: @movie, member: @current_user.actable))
+    @review.current_user_instance = current_user
     if @review.save
       redirect_to movie_path(@movie)
     else

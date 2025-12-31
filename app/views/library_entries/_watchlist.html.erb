@@ -2,7 +2,6 @@
 <% entry = (user&.actable_type == 'Member') ? user.actable.library_entries.find_by(movie: movie) : nil %>
 
 <div id="watchlist-section-<%= movie.id %>">
-  <%# Only Members can have a watchlist %>
   <% if user&.actable_type == 'Member' %>
     
     <%# Using the toggle path: one route for both adding and removing %>
@@ -14,7 +13,6 @@
     <% end %>
 
   <% else %>
-    <%# Optional: Show a locked message for Moderators %>
     <span style="color: #678; font-size: 0.65rem; text-transform: uppercase;">Member Feature</span>
   <% end %>
 </div>

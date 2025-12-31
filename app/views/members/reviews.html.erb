@@ -55,7 +55,7 @@
                       method: :post, onclick: "event.stopPropagation();",
                       style: "background:none; border:none; cursor:pointer; padding:0; display:inline-flex; align-items:center; gap:6px;" do %>
                   
-                  <span style="color: <%= review.likes.exists?(member: member) ? '#ff8000' : '#678' %>; font-size: 14px;">
+                  <span style="color: <%= review.likes.exists?(member: @member) ? '#ff8000' : '#678' %>; font-size: 14px;">
                     ❤
                   </span>
                   <span style="color: #678; font-size: 13px;">

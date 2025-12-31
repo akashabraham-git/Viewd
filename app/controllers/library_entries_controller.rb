@@ -1,6 +1,5 @@
 class LibraryEntriesController < ApplicationController
   before_action :set_movie
-  before_action :set_user
 
   def toggle_watched
     entry = LibraryEntry.find_or_initialize_by(member: @current_user.actable, movie: @movie)
@@ -39,10 +38,4 @@ class LibraryEntriesController < ApplicationController
     end
   end
 
-  def set_user
-    @user = User.second
-    if @user.nil?
-      redirect_to movies_path, alert: "Please log in to enter activity"
-    end
-  end
 end

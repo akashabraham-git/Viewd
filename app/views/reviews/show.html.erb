@@ -26,7 +26,6 @@
         <%= @review.movie.title %>
       </h2>
 
-      <%# USER ROW %>
       <%= link_to user_path(@review.member.user), style:"text-decoration:none;display:flex;gap:12px;align-items:center;" do %>
 
         <div style="display:flex;
@@ -39,8 +38,8 @@
                       border-radius:50%;
                       overflow:hidden;
                       background:#2c3440;">
-            <% if @review.member.user.actable.profile_picture&.attached? %>
-              <%= image_tag @review.member.user.actable.profile_picture,
+            <% if @review.member.profile_picture&.attached? %>
+              <%= image_tag @review.member.profile_picture,
                   style:"width:100%;height:100%;object-fit:cover;" %>
             <% else %>
               <div style="width:100%;height:100%;
@@ -53,7 +52,6 @@
             <% end %>
           </div>
 
-          <%# USERNAME + RATING %>
           <div>
             <p style="margin:0;
                       color:#fff;
@@ -103,9 +101,9 @@
                       align-items:center;
                       gap:5px;" do %>
 
-          <span style="color:<%= @review.likes.exists?(member: @current_user.actable) ? '#ff4b4b' : '#678' %>;
+          <span style="color:<%= @review.likes.exists?(member: @current_user&.actable) ? '#ff4b4b' : '#678' %>;
                       font-size:1rem;">
-            <%= @review.likes.exists?(member: @current_user.actable) ? '❤' : '♡' %>
+            <%= @review.likes.exists?(member: @current_user&.actable) ? '❤' : '♡' %>
           </span>
 
           <span style="color:#678;

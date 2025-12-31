@@ -20,6 +20,7 @@ class CastsController < ApplicationController
     if @cast.save
       redirect_to casts_path, notice: "Person added successfully."
     else
+      flash.now[:alert] =  @cast.errors.full_messages.to_sentence
       render :new, status: :unprocessable_entity
     end
   end
@@ -31,6 +32,7 @@ class CastsController < ApplicationController
     if @cast_member.update(cast_params)
       redirect_to cast_path(@cast_member), notice: "Updated successfully."
     else
+      flash.now[:alert] =  @cast_member.errors.full_messages.to_sentence
       render :edit, status: :unprocessable_entity
     end
   end
@@ -45,13 +47,6 @@ class CastsController < ApplicationController
   def set_cast_member
     @cast_member = Cast.find(params[:id])
   end
-
-  def authorize_moderator!
-    unless @current_user&.actable_type == 'Moderator'
-      redirect_to root_path, alert: "You do not have permission to manage cast members."
-    end
-  end
-
 
   def cast_params
     params.require(:cast).permit(:name, :pic, :bio)

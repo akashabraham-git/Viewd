@@ -1,0 +1,35 @@
+<% if params[:role] == 'moderator' %>
+  <h2 style="color: #ff4b4b;">Moderator Secure Login</h2>
+<% else %>
+  <h2>Log in</h2>
+<% end %>
+
+<%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+  <div class="field">
+    <%= f.label :email %><br />
+    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+  </div>
+
+  <div class="field">
+    <%= f.label :password %><br />
+    <%= f.password_field :password, autocomplete: "current-password" %>
+  </div>
+
+  <% if devise_mapping.rememberable? %>
+    <div class="field">
+      <%= f.check_box :remember_me %>
+      <%= f.label :remember_me %>
+    </div>
+  <% end %>
+
+  <div class="actions">
+    <%= f.submit "Log in" %>
+  </div>
+<% end %>
+
+<div style="background: #2c3440; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+  <p style="color: #9ab;">Are you a Moderator?</p>
+  <%= link_to "Go to Moderator Login", new_user_session_path(role: 'moderator'), style: "color: #00e054;" %>
+</div>
+
+<%= render "devise/shared/links" %>
