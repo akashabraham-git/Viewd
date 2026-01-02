@@ -1,47 +1,66 @@
-<h2>Sign up</h2>
+<div style="max-width: 500px; margin: 40px auto; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #fff; background: #14181c; padding: 30px; border-radius: 8px;">
 
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+  <h2 style="color: #fff; margin-top: 0; font-size: 1.5rem; text-align: center;">Join the Community</h2>
 
-  <div class="field">
-    <%= f.label :name %><br />
-    <%= f.text_field :name, autofocus: true %>
-  </div>
+  <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "signup-form", multipart: true }) do |f| %>
+    <%= render "devise/shared/error_messages", resource: resource %>
 
-  <div class="field">
-    <%= f.label :username %><br />
-    <%= f.text_field :username %>
-  </div>
+    <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+      <div style="flex: 1;">
+        <%= f.label :name, style: "display: block; color: #9ab; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px;" %>
+        <%= f.text_field :name, autofocus: true, required: true, style: "width: 100%; padding: 10px; border: 1px solid #456; border-radius: 4px; background: #2c3440; color: #fff; box-sizing: border-box;" %>
+      </div>
+      <div style="flex: 1;">
+        <%= f.label :username, style: "display: block; color: #9ab; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px;" %>
+        <%= f.text_field :username, required: true, style: "width: 100%; padding: 10px; border: 1px solid #456; border-radius: 4px; background: #2c3440; color: #fff; box-sizing: border-box;" %>
+      </div>
+    </div>
 
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autocomplete: "email" %>
-  </div>
+    <div style="margin-bottom: 15px;">
+      <%= f.label :email, style: "display: block; color: #9ab; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px;" %>
+      <%= f.email_field :email, autocomplete: "email", required: true, style: "width: 100%; padding: 10px; border: 1px solid #456; border-radius: 4px; background: #2c3440; color: #fff; box-sizing: border-box;" %>
+    </div>
 
-  <% resource.build_member_identity %>
-  <%= f.fields_for :actable do |af| %>
-    <div class="field">
-      <%= af.label :bio, "Tell us about yourself (Bio)" %><br />
-      <%= af.text_area :bio %>
+    <% resource.build_member_identity %>
+    <%= f.fields_for :actable do |af| %>
+      <%# --- PROFILE PICTURE FIELD --- %>
+      <div style="margin-bottom: 15px;">
+        <%= af.label :profile_picture, "Profile Picture", style: "display: block; color: #9ab; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px;" %>
+        <%= af.file_field :profile_picture, style: "color: #9ab; font-size: 0.8rem;" %>
+      </div>
+
+      <div style="margin-bottom: 15px;">
+        <%= af.label :bio, "Bio", style: "display: block; color: #9ab; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px;" %>
+        <%= af.text_area :bio, placeholder: "A bit about you...", style: "width: 100%; padding: 10px; border: 1px solid #456; border-radius: 4px; background: #2c3440; color: #fff; height: 80px; box-sizing: border-box;" %>
+      </div>
+    <% end %>
+
+    <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+      <div style="flex: 1;">
+        <%= f.label :password, style: "display: block; color: #9ab; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px;" %>
+        <%= f.password_field :password, autocomplete: "new-password", required: true, style: "width: 100%; padding: 10px; border: 1px solid #456; border-radius: 4px; background: #2c3440; color: #fff; box-sizing: border-box;" %>
+      </div>
+      <div style="flex: 1;">
+        <%= f.label :password_confirmation, "Confirm", style: "display: block; color: #9ab; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px;" %>
+        <%= f.password_field :password_confirmation, autocomplete: "new-password", required: true, style: "width: 100%; padding: 10px; border: 1px solid #456; border-radius: 4px; background: #2c3440; color: #fff; box-sizing: border-box;" %>
+      </div>
+    </div>
+
+    <div class="actions">
+      <%= f.submit "CREATE ACCOUNT", style: "width: 100%; padding: 14px; border: none; border-radius: 4px; background: #00e054; color: #000; font-weight: bold; cursor: pointer; letter-spacing: 1px;" %>
     </div>
   <% end %>
 
-  <div class="field">
-    <%= f.label :password %>
-    <% if @minimum_password_length %>
-    <em>(<%= @minimum_password_length %> characters minimum)</em>
-    <% end %><br />
-    <%= f.password_field :password, autocomplete: "new-password" %>
+  <div style="text-align: center; margin-top: 20px; font-size: 0.85rem;">
+    <%= render "devise/shared/links" %>
   </div>
+</div>
 
-  <div class="field">
-    <%= f.label :password_confirmation %><br />
-    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
-  </div>
-
-  <div class="actions">
-    <%= f.submit "Sign up" %>
-  </div>
-<% end %>
-
-<%= render "devise/shared/links" %>
+<style>
+  .signup-form:invalid input[type="submit"] {
+    background-color: #456 !important;
+    color: #89a !important;
+    pointer-events: none;
+    opacity: 0.6;
+  }
+</style>

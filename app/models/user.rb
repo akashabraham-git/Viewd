@@ -15,7 +15,6 @@ class User < ApplicationRecord
   before_validation :normalize_username, :normalize_email
   before_create :normalize_name
   after_commit :send_welcome_email, on: :create
-  before_validation :ensure_member_identity, on: :create
 
   def normalize_username
     self.username = username.downcase.strip if username.present?

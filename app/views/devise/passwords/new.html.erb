@@ -1,16 +1,49 @@
-<h2>Forgot your password?</h2>
+<div style="max-width: 400px; margin: 40px auto; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #fff; background: #14181c; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
 
-<%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
+  <h2 style="color: #fff; margin-top: 0; font-size: 1.5rem; text-align: center; letter-spacing: -0.5px;">Reset Password</h2>
+  
+  <p style="color: #9ab; font-size: 0.9rem; text-align: center; margin-bottom: 25px; line-height: 1.4;">
+    Enter your email address and we'll send you a link to reset your password.
+  </p>
 
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
+  <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post, class: "forgot-password-form" }) do |f| %>
+    <%= render "devise/shared/error_messages", resource: resource %>
+
+    <div style="margin-bottom: 25px;">
+      <%= f.label :email, "Email Address", style: "display: block; color: #9ab; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;" %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email", required: true,
+          style: "width: 100%; padding: 12px; border: 1px solid #456; border-radius: 4px; background: #2c3440; color: #fff; box-sizing: border-box; font-size: 1rem;" %>
+    </div>
+
+    <div class="actions">
+      <%= f.submit "SEND INSTRUCTIONS", 
+          style: "width: 100%; padding: 14px; border: none; border-radius: 4px; background: #00e054; color: #000; font-weight: bold; font-size: 0.9rem; letter-spacing: 1px; cursor: pointer; transition: background 0.2s;" %>
+    </div>
+  <% end %>
+
+  <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px solid #2c3440; font-size: 0.85rem;">
+    <%= render "devise/shared/links" %>
   </div>
 
-  <div class="actions">
-    <%= f.submit "Send me reset password instructions" %>
-  </div>
-<% end %>
+</div>
 
-<%= render "devise/shared/links" %>
+<style>
+  /* Button is dimmed until an email is entered */
+  .forgot-password-form:invalid input[type="submit"] {
+    background-color: #456 !important;
+    color: #89a !important;
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .forgot-password-form:valid input[type="submit"] {
+    background-color: #00e054 !important;
+    color: #000 !important;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .forgot-password-form:valid input[type="submit"]:hover {
+    background-color: #00c048 !important;
+  }
+</style>

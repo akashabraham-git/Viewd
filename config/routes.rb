@@ -1,5 +1,12 @@
 Rails.application.routes.draw do
+  
+  devise_for :admin_users, ActiveAdmin::Devise.config
+  ActiveAdmin.routes(self)
+  
   devise_for :users
+
+  root "movies#index"
+  
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -11,7 +18,7 @@ Rails.application.routes.draw do
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
 
-  root "movies#index"
+  
 
   resources :movies do
     member do
@@ -30,7 +37,7 @@ Rails.application.routes.draw do
     resources :library_entries, only: [:create, :update, :destroy]
   end
 
-  resources :users, hide: [:index]
+  resources :users, except: [:index]
 
   resources :members, only: [] do
     member do

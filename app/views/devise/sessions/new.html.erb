@@ -1,35 +1,82 @@
-<% if params[:role] == 'moderator' %>
-  <h2 style="color: #ff4b4b;">Moderator Secure Login</h2>
-<% else %>
-  <h2>Log in</h2>
-<% end %>
+<div style="max-width: 400px; margin: 40px auto; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #fff; background: #14181c; padding: 30px; border-radius: 8px;">
 
-<%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, autocomplete: "email" %>
-  </div>
+  <% if params[:role] == 'moderator' %>
+    <h2 style="color: #ff4b4b; margin-top: 0; font-size: 1.5rem; text-align: center;">Moderator Secure Login</h2>
+  <% else %>
+    <h2 style="color: #fff; margin-top: 0; font-size: 1.5rem; text-align: center;">Log in</h2>
+  <% end %>
 
-  <div class="field">
-    <%= f.label :password %><br />
-    <%= f.password_field :password, autocomplete: "current-password" %>
-  </div>
+  <%= form_for(resource, as: resource_name, url: session_path(resource_name), html: { class: "login-form-container" }) do |f| %>
+    
+    <%# --- EMAIL FIELD --- %>
+    <div style="margin-bottom: 15px;">
+      <%= f.label :email, style: "display: block; color: #9ab; font-size: 0.85rem; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;" %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email", required: true,
+          style: "width: 100%; padding: 12px; border: 1px solid #456; border-radius: 4px; background: #2c3440; color: #fff; box-sizing: border-box;" %>
+    </div>
 
-  <% if devise_mapping.rememberable? %>
-    <div class="field">
-      <%= f.check_box :remember_me %>
-      <%= f.label :remember_me %>
+    <%# --- PASSWORD FIELD --- %>
+    <div style="margin-bottom: 15px;">
+      <div style="display: flex; justify-content: space-between;">
+        <%= f.label :password, style: "color: #9ab; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;" %>
+        <%= link_to "Forgot?", new_password_path(resource_name), style: "color: #678; font-size: 0.75rem; text-decoration: none;" %>
+      </div>
+      <%= f.password_field :password, autocomplete: "current-password", required: true,
+          style: "width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #456; border-radius: 4px; background: #2c3440; color: #fff; box-sizing: border-box;" %>
+    </div>
+
+    <%# --- REMEMBER ME --- %>
+    <% if devise_mapping.rememberable? %>
+      <div style="margin-bottom: 20px; display: flex; align-items: center; color: #9ab; font-size: 0.9rem;">
+        <%= f.check_box :remember_me, style: "margin-right: 10px;" %>
+        <%= f.label :remember_me %>
+      </div>
+    <% end %>
+
+    <%# --- SUBMIT BUTTON --- %>
+    <div class="actions">
+      <%= f.submit "LOG IN", 
+          style: "width: 100%; padding: 14px; border: none; border-radius: 4px; font-weight: bold; font-size: 0.9rem; letter-spacing: 1px; cursor: pointer; transition: background 0.2s;" %>
     </div>
   <% end %>
 
-  <div class="actions">
-    <%= f.submit "Log in" %>
-  </div>
-<% end %>
+  <hr style="border: 0; border-top: 1px solid #2c3440; margin: 25px 0;">
 
-<div style="background: #2c3440; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
-  <p style="color: #9ab;">Are you a Moderator?</p>
-  <%= link_to "Go to Moderator Login", new_user_session_path(role: 'moderator'), style: "color: #00e054;" %>
+  <%# --- ROLE TOGGLE BOX --- %>
+  <div style="background: #2c3440; padding: 15px; border-radius: 4px; text-align: center;">
+    <% if params[:role] == 'moderator' %>
+      <p style="color: #9ab; margin: 0 0 10px 0; font-size: 0.9rem;">Not a Moderator?</p>
+      <%= link_to "Standard User Login", new_user_session_path, style: "color: #00e054; text-decoration: none; font-weight: bold;" %>
+    <% else %>
+      <p style="color: #9ab; margin: 0 0 10px 0; font-size: 0.9rem;">Are you a Moderator?</p>
+      <%= link_to "Go to Moderator Login", new_user_session_path(role: 'moderator'), style: "color: #00e054; text-decoration: none; font-weight: bold;" %>
+    <% end %>
+  </div>
+
+  <div style="text-align: center; margin-top: 20px; font-size: 0.85rem;">
+    <%= render "devise/shared/links" %>
+  </div>
+
 </div>
 
-<%= render "devise/shared/links" %>
+<style>
+  /* Logic to disable/enable button based on HTML5 required validation */
+  .login-form-container:invalid input[type="submit"] {
+    background-color: #456 !important;
+    color: #89a !important;
+    opacity: 0.6;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  .login-form-container:valid input[type="submit"] {
+    background-color: #00e054 !important;
+    color: #000 !important;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .login-form-container:valid input[type="submit"]:hover {
+    background-color: #00c048 !important;
+  }
+</style>

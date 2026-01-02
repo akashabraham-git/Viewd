@@ -1,25 +1,58 @@
-<h2>Change your password</h2>
+<div style="max-width: 400px; margin: 40px auto; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #fff; background: #14181c; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
 
-<%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f| %>
-  <%= render "devise/shared/error_messages", resource: resource %>
-  <%= f.hidden_field :reset_password_token %>
+  <h2 style="color: #fff; margin-top: 0; font-size: 1.5rem; text-align: center; letter-spacing: -0.5px;">Set New Password</h2>
 
-  <div class="field">
-    <%= f.label :password, "New password" %><br />
-    <% if @minimum_password_length %>
-      <em>(<%= @minimum_password_length %> characters minimum)</em><br />
-    <% end %>
-    <%= f.password_field :password, autofocus: true, autocomplete: "new-password" %>
+  <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put, class: "password-reset-form" }) do |f| %>
+    <%= render "devise/shared/error_messages", resource: resource %>
+    
+    <%# CRITICAL: This hidden field carries the identity token from the email link %>
+    <%= f.hidden_field :reset_password_token %>
+
+    <%# --- NEW PASSWORD --- %>
+    <div style="margin-bottom: 15px;">
+      <%= f.label :password, "New Password", style: "display: block; color: #9ab; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px;" %>
+      <% if @minimum_password_length %>
+        <span style="color: #678; font-size: 0.7rem; display: block; margin-bottom: 5px;">
+          (<%= @minimum_password_length %> characters minimum)
+        </span>
+      <% end %>
+      <%= f.password_field :password, autofocus: true, autocomplete: "new-password", required: true,
+          style: "width: 100%; padding: 12px; border: 1px solid #456; border-radius: 4px; background: #2c3440; color: #fff; box-sizing: border-box;" %>
+    </div>
+
+    <%# --- CONFIRMATION --- %>
+    <div style="margin-bottom: 25px;">
+      <%= f.label :password_confirmation, "Confirm New Password", style: "display: block; color: #9ab; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px;" %>
+      <%= f.password_field :password_confirmation, autocomplete: "new-password", required: true,
+          style: "width: 100%; padding: 12px; border: 1px solid #456; border-radius: 4px; background: #2c3440; color: #fff; box-sizing: border-box;" %>
+    </div>
+
+    <%# --- SUBMIT --- %>
+    <div class="actions">
+      <%= f.submit "UPDATE PASSWORD", 
+          style: "width: 100%; padding: 14px; border: none; border-radius: 4px; background: #00e054; color: #000; font-weight: bold; font-size: 0.9rem; letter-spacing: 1px; cursor: pointer; transition: background 0.2s;" %>
+    </div>
+  <% end %>
+
+  <div style="text-align: center; margin-top: 25px; padding-top: 15px; border-top: 1px solid #2c3440; font-size: 0.85rem;">
+    <%= render "devise/shared/links" %>
   </div>
 
-  <div class="field">
-    <%= f.label :password_confirmation, "Confirm new password" %><br />
-    <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
-  </div>
+</div>
 
-  <div class="actions">
-    <%= f.submit "Change my password" %>
-  </div>
-<% end %>
+<style>
+  /* Button stays locked until both fields have input */
+  .password-reset-form:invalid input[type="submit"] {
+    background-color: #456 !important;
+    color: #89a !important;
+    opacity: 0.6;
+    pointer-events: none;
+  }
 
-<%= render "devise/shared/links" %>
+  .password-reset-form:valid input[type="submit"] {
+    background-color: #00e054 !important;
+    color: #000 !important;
+    opacity: 1;
+    pointer-events: auto;
+  }
+</style>
