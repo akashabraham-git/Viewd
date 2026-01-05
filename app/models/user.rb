@@ -16,6 +16,9 @@ class User < ApplicationRecord
   before_create :normalize_name
   after_commit :send_welcome_email, on: :create
 
+  scope :member, -> { where('actable_type ILIKE ?', "member") }
+  scope :moderator, -> { where('actable_type ILIKE ?', "moderator") }
+
   def normalize_username
     self.username = username.downcase.strip if username.present?
   end
@@ -41,6 +44,14 @@ class User < ApplicationRecord
 
   def build_member_identity
     self.actable ||= Member.new if self.actable_type.nil? || self.actable_type == 'Member'
+  end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["id", "username", "name", "email", "actable_type", "created_at", "updated_at"]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["actable"]
   end
 
 end

@@ -14,4 +14,13 @@ class Membership < ApplicationRecord
       self.expires_at ||= 1.month.from_now
     end
   end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["id", "status", "started_at", "expires_at"]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["member", "membership_tier"]
+  end
+
 end

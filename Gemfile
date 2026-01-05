@@ -65,3 +65,5 @@ gem "devise"
 gem 'activeadmin'
 
 gem 'sassc-rails'
+
+gem 'country_select'

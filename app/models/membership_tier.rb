@@ -4,6 +4,11 @@ class MembershipTier < ApplicationRecord
 
   before_create :set_badge
 
+
+  scope :free, -> { where('name ILIKE ?', "Free") }
+  scope :pro, -> { where('name ILIKE ?', "Pro") }
+  scope :patron, -> { where('name ILIKE ?', "Patron") }
+
   def set_badge
     if self.name == "Pro"
       self.badge = :gold
@@ -30,4 +35,13 @@ class MembershipTier < ApplicationRecord
     gold: 0,
     diamond: 1
   }
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["name", "price", "country", "id", "badge"]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["memberships"]
+  end
+
 end

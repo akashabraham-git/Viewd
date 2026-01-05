@@ -11,6 +11,7 @@ class Member < ApplicationRecord
   has_many :likes, dependent: :destroy
   has_many :ratings, dependent: :destroy
   has_many :reviews, dependent: :destroy
+  accepts_nested_attributes_for :user
 
   enum :country, { 
     unknown: 0, 
@@ -36,5 +37,12 @@ class Member < ApplicationRecord
     end
   end
 
+  def self.ransackable_attributes(auth_object = nil)
+    ["id", "bio", "country", "created_at"]
+  end
+  
+  def self.ransackable_associations(auth_object = nil)
+    ["user", "membership", "following", "followers", "active_connections"]
+  end
 
 end

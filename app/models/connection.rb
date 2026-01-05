@@ -17,5 +17,13 @@ class Connection < ApplicationRecord
       errors.add(:follower_id, "you cannot follow yourself")
     end
   end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["id", "follower_id", "following_id", "created_at"]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["follower", "following"]
+  end
   
 end
