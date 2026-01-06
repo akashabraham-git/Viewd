@@ -3,12 +3,14 @@
   <h2 style="color: #fff; margin-top: 0; font-size: 1.5rem; text-align: center; letter-spacing: -0.5px;">Set New Password</h2>
 
   <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put, class: "password-reset-form" }) do |f| %>
-    <%= render "devise/shared/error_messages", resource: resource %>
+    <% if resource.errors.any? %>
+      <div style="background: #ff4b4b; color: #fff; padding: 12px; border-radius: 4px; margin-bottom: 20px; font-size: 0.85rem; text-align: center;">
+        <%= resource.errors.full_messages.first %>
+      </div>
+    <% end %>
     
-    <%# CRITICAL: This hidden field carries the identity token from the email link %>
     <%= f.hidden_field :reset_password_token %>
 
-    <%# --- NEW PASSWORD --- %>
     <div style="margin-bottom: 15px;">
       <%= f.label :password, "New Password", style: "display: block; color: #9ab; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px;" %>
       <% if @minimum_password_length %>
@@ -20,14 +22,12 @@
           style: "width: 100%; padding: 12px; border: 1px solid #456; border-radius: 4px; background: #2c3440; color: #fff; box-sizing: border-box;" %>
     </div>
 
-    <%# --- CONFIRMATION --- %>
     <div style="margin-bottom: 25px;">
       <%= f.label :password_confirmation, "Confirm New Password", style: "display: block; color: #9ab; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px;" %>
       <%= f.password_field :password_confirmation, autocomplete: "new-password", required: true,
           style: "width: 100%; padding: 12px; border: 1px solid #456; border-radius: 4px; background: #2c3440; color: #fff; box-sizing: border-box;" %>
     </div>
 
-    <%# --- SUBMIT --- %>
     <div class="actions">
       <%= f.submit "UPDATE PASSWORD", 
           style: "width: 100%; padding: 14px; border: none; border-radius: 4px; background: #00e054; color: #000; font-weight: bold; font-size: 0.9rem; letter-spacing: 1px; cursor: pointer; transition: background 0.2s;" %>

@@ -2,12 +2,10 @@ ActiveAdmin.register Member do
   permit_params :bio, :country, 
                 user_attributes: [:id, :username, :email, :password, :password_confirmation]
 
-  scope :all, default: true
-  
-  filter :user_username, label: "Username"
-  filter :user_email, label: "Email"
+
+  filter :user_username_cont, label: "Username"
+  filter :user_email_cont, label: "Email"
   filter :country, as: :select, collection: -> { Member.pluck(:country).uniq }
-  filter :membership_status, as: :select, collection: -> { Membership.statuses }
 
   index do
     selectable_column
@@ -15,14 +13,15 @@ ActiveAdmin.register Member do
     column :username do |m| m.user&.username end
     column :email do |m| m.user&.email end
     column :country
-    column "Status" do |m|
-      status_tag m.membership&.status || "No Membership"
+    column "Membership" do |m|
+      m.membership&.membership_tier&.name || "No Membership"
     end
     actions
   end
 
   show title: ->(m) { m.user&.username } do
     attributes_table do
+      row :id
       row :username do |m| m.user&.username end
       row :email do |m| m.user&.email end
       row :bio
@@ -30,7 +29,7 @@ ActiveAdmin.register Member do
       row :created_at
     end
     
-    panel "Membership History" do
+    panel "Membership Details" do
       table_for member.membership do
         column :membership_tier
         column :status
@@ -50,9 +49,20 @@ ActiveAdmin.register Member do
     end
     f.inputs "Member Profile" do
       f.input :bio
-      f.input :country, as: :string
+      f.input :country, as: :select, collection: MembershipTier.pluck(:country).uniq
     end
     f.actions
+  end
+
+  controller do
+    def update
+      user_params = params[:member][:user_attributes]
+      if user_params[:password].blank? && user_params[:password_confirmation].blank?
+        user_params.delete(:password)
+        user_params.delete(:password_confirmation)
+      end
+      super
+    end
   end
 
   action_item :view_following, only: :show do

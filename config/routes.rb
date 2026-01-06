@@ -1,4 +1,11 @@
 Rails.application.routes.draw do
+  namespace :api do
+    namespace :v1 do
+      resources :movies, only: [:index, :show]
+      resources :casts, only: [:show]
+      resources :likes, only: [:create, :destroy]
+    end
+  end
   
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
@@ -18,7 +25,7 @@ Rails.application.routes.draw do
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
 
-  
+
 
   resources :movies do
     member do
@@ -52,6 +59,8 @@ Rails.application.routes.draw do
   resources :genres
   resources :memberships, only: [:index, :update]
   resources :connections,   only: [:index, :create, :destroy]
+
+
 end
 
 

@@ -1,18 +1,28 @@
 ActiveAdmin.register Rating do
+  permit_params :rating, :member_id, :movie_id
 
-  # See permitted parameters documentation:
-  # https://github.com/activeadmin/activeadmin/blob/master/docs/2-resource-customization.md#setting-up-strong-parameters
-  #
-  # Uncomment all parameters which should be permitted for assignment
-  #
-  # permit_params :movie_id, :rating, :member_id
-  #
-  # or
-  #
-  # permit_params do
-  #   permitted = [:movie_id, :rating, :member_id]
-  #   permitted << :other if params[:action] == 'create' && current_user.admin?
-  #   permitted
-  # end
-  
+  filter :movie
+  filter :rating
+
+  index do
+    selectable_column
+    column :movie
+    column "Member" do |c| 
+      link_to c.member.user.username, admin_member_path(c.member)
+    end
+    column "Stars" do |r|
+      "★" * r.rating
+    end
+    actions
+  end
+
+  form do |f|
+    f.inputs do
+      f.input :movie
+      f.input :member, collection: Member.all.map { |m| [m.user.username, m.id] }
+      f.input :rating, as: :select, collection: (1..5)
+    end
+    f.actions
+  end
+
 end

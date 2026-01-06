@@ -5,15 +5,16 @@ ActiveAdmin.register Membership do
   scope :active, -> { where(status: 'active') }
   scope :expired, -> { where('expires_at < ?', Time.now) }
 
-  filter :member_id, label: "Member ID"
-  filter :membership_tier
-  filter :status, as: :select, collection: -> { Membership.statuses }
+  filter :member_user_username_cont, label: "Member username"
+  filter :membership_tier, as: :select, collection: -> { MembershipTier.pluck(:name).uniq }
+  filter :member_country, as: :select, collection: -> { MembershipTier.pluck(:country).uniq }
   filter :expires_at
+  filter :started_at
 
   index do
     selectable_column
     id_column
-    column :member
+    column "Member username" do |m| link_to m.member.user.username, admin_member_path(m.member) end
     column :membership_tier
     column :status do |m|
       status_tag m.status

@@ -11,9 +11,17 @@ class Rating < ApplicationRecord
   after_create :mark_as_watched
 
   def mark_as_watched
-    entry = LibraryEntry.find_or_initialize_by(member: current_user_instance.actable, movie: movie)
+    entry = LibraryEntry.find_or_initialize_by(member: member, movie: movie)
     if entry.watched_date.nil?
       entry.update(watched_date: Date.today, in_watchlist: false)
     end
+  end
+
+  def self.ransackable_attributes(auth_object = nil)
+    ["id", "rating", "created_at", "movie_id", "member_id"]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    ["member", "movie"]
   end
 end

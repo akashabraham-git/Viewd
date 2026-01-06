@@ -30,23 +30,89 @@
       
       <div style="margin-top: 20px; line-height: 1.6; color: #9ab;">
         <h4 style="color: #fff; border-bottom: 1px solid #2c3440; padding-bottom: 5px; font-size: 0.8rem;">BIO</h4>
-        <p><%= @cast_member.bio || "No biography available for this member." %></p>
+        <div style="margin-top: 10px;">
+          <% if @cast_member.bio.present? %>
+            <details class="bio-wrapper">
+              <summary class="bio-summary">
+                <div class="bio-preview"><%= @cast_member.bio %></div>
+                <span class="toggle-text">Show More</span>
+              </summary>
+              <div class="bio-full">
+                <%= @cast_member.bio %>
+              </div>
+            </details>
+          <% else %>
+            <p style="font-style: italic;">No biography available for this member.</p>
+          <% end %>
+        </div>
       </div>
     </div>
   </div>
 
-  <h4 style="color: #fff; border-bottom: 1px solid #456; padding-bottom: 5px; margin-bottom: 20px; font-size: 0.8rem; letter-spacing: 1px;">FILMOGRAPHY</h4>
-  
-  <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 20px;">
-    <% @movies.each do |movie| %>
-      <div style="display: flex; flex-direction: column;">
-        <%= link_to movie_path(movie), style: "text-decoration: none;" do %>
-          <div style="aspect-ratio: 2/3; background: #1a2129; border: 1px solid #2c3440; border-radius: 4px; overflow: hidden;">
-            <%= image_tag movie.poster_url, style: "width: 100%; height: 100%; object-fit: cover;" if movie.poster_url.present? %>
+  <h4 style="color: #fff; border-bottom: 1px solid #456; padding-bottom: 5px; margin-bottom: 30px; font-size: 0.8rem; letter-spacing: 1px;">FILMOGRAPHY</h4>
+
+  <% @grouped_credits.each do |job, credits| %>
+    <div style="margin-bottom: 40px;">
+      <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 15px; border-left: 3px solid #00e054; padding-left: 10px;">
+        As <%= job %>
+      </h3>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 20px;">
+        <% credits.each do |credit| %>
+          <% movie = credit.movie %>
+          <div style="display: flex; flex-direction: column; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+            <%= link_to movie_path(movie), style: "text-decoration: none;" do %>
+              <div style="aspect-ratio: 2/3; background: #1a2129; border: 1px solid #2c3440; border-radius: 4px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                <% if movie.poster_url.present? %>
+                  <%= image_tag movie.poster_url, style: "width: 100%; height: 100%; object-fit: cover;" %>
+                <% end %>
+              </div>
+              <p style="color: #fff; font-size: 0.85rem; margin-top: 8px; margin-bottom: 2px; font-weight: 500;"><%= movie.title %></p>
+              
+              <%# Show the character name if they are an actor %>
+              <% if credit.character.present? %>
+                <p style="color: #678; font-size: 0.75rem; margin: 0; font-style: italic;"><%= credit.character %></p>
+              <% end %>
+              
+              <p style="color: #456; font-size: 0.75rem; margin-top: 2px;"><%= movie.release_date&.year %></p>
+            <% end %>
           </div>
-          <p style="color: #fff; font-size: 0.85rem; margin-top: 8px; text-align: center;"><%= movie.title %></p>
         <% end %>
       </div>
-    <% end %>
-  </div>
+    </div>
+  <% end %>
 </div>
+
+
+<style>
+  .bio-summary::-webkit-details-marker { display: none; }
+  .bio-summary { list-style: none; outline: none; cursor: pointer; }
+
+  .bio-preview {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;  
+    overflow: hidden;
+    color: #9ab;
+  }
+
+  .toggle-text {
+    display: inline-block;
+    margin-top: 5px;
+    color: #00e054;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+
+  .bio-wrapper[open] .bio-preview,
+  .bio-wrapper[open] .toggle-text {
+    display: none;
+  }
+
+  /* The Full Text: Shown only when open */
+  .bio-full {
+    color: #9ab;
+    white-space: pre-line; /* Keeps paragraph breaks */
+  }
+</style>

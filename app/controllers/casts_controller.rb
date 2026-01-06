@@ -9,6 +9,7 @@ class CastsController < ApplicationController
   def show
     @movies = @cast_member.movies.distinct
     @jobs = @cast_member.credits.where(cast_id: @cast_member.id).distinct.pluck(:job)
+    @grouped_credits = @cast_member.credits.includes(:movie).group_by(&:job)
   end
 
   def new

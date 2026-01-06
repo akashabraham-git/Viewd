@@ -3,7 +3,11 @@
   <h2 style="color: #fff; margin-top: 0; font-size: 1.5rem; text-align: center;">Join the Community</h2>
 
   <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { class: "signup-form", multipart: true }) do |f| %>
-    <%= render "devise/shared/error_messages", resource: resource %>
+    <% if resource.errors.any? %>
+      <div style="background: #ff4b4b; color: #fff; padding: 12px; border-radius: 4px; margin-bottom: 20px; font-size: 0.85rem; text-align: center;">
+        <%= resource.errors.full_messages.first %>
+      </div>
+    <% end %>
 
     <div style="display: flex; gap: 15px; margin-bottom: 15px;">
       <div style="flex: 1;">

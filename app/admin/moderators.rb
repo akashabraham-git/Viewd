@@ -2,12 +2,13 @@ ActiveAdmin.register Moderator do
   permit_params :employee_number, :department, 
                 user_attributes: [:id, :username, :email, :password, :password_confirmation]
 
-  filter :user_username, label: "Username"
+  filter :user_username_cont, label: "Username"
   filter :department, as: :select, collection: -> { Moderator.pluck(:department).uniq }
   filter :employee_number
 
   index do
     selectable_column
+    id_column
     column :employee_number
     column :department
     column :username do |mod| mod.user&.username end

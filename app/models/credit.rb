@@ -4,6 +4,9 @@ class Credit < ApplicationRecord
 
   before_save :normalize_character
 
+  scope :actors, -> { where(job: 'Actor') }
+  scope :crew, -> { where.not(job: 'Actor') }
+
   def normalize_character
     self.character = character.squish.titleize if character.present?
   end

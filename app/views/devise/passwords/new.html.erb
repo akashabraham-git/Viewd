@@ -7,7 +7,11 @@
   </p>
 
   <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post, class: "forgot-password-form" }) do |f| %>
-    <%= render "devise/shared/error_messages", resource: resource %>
+    <% if resource.errors.any? %>
+      <div style="background: #ff4b4b; color: #fff; padding: 12px; border-radius: 4px; margin-bottom: 20px; font-size: 0.85rem; text-align: center;">
+        <%= resource.errors.full_messages.first %>
+      </div>
+    <% end %>
 
     <div style="margin-bottom: 25px;">
       <%= f.label :email, "Email Address", style: "display: block; color: #9ab; font-size: 0.75rem; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;" %>
@@ -28,7 +32,6 @@
 </div>
 
 <style>
-  /* Button is dimmed until an email is entered */
   .forgot-password-form:invalid input[type="submit"] {
     background-color: #456 !important;
     color: #89a !important;
