@@ -1,12 +1,22 @@
 Rails.application.routes.draw do
-  namespace :api do
+  use_doorkeeper
+  namespace :api, defaults: { format: :json } do
     namespace :v1 do
-      resources :movies, only: [:index, :show]
-      resources :casts, only: [:show]
-      resources :likes, only: [:create, :destroy]
+      resources :movies do
+        member do
+          post :toggle_watched
+          post :toggle_watchlist
+          post 'like', to: 'likes#toggle_movie_like'
+          post 'rating', to: 'ratings#toggle'
+        end
+      end
+
+      resources :casts
+      resources :genres
+      
     end
   end
-  
+
   devise_for :admin_users, ActiveAdmin::Devise.config
   ActiveAdmin.routes(self)
   

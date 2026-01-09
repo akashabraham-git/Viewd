@@ -17,7 +17,7 @@ class Movie < ApplicationRecord
   }
 
   def average_rating
-    ratings.average(:rating).to_f.round(1)
+    ratings.average(:rating).to_f.round(1) || 0.0
   end
 
   def self.ransackable_attributes(auth_object = nil)

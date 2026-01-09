@@ -16,6 +16,8 @@ gem "turbo-rails"
 gem "stimulus-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
+
+gem 'pagy', '~> 9.0'
 # Use Redis adapter to run Action Cable in production
 # gem "redis", ">= 4.0.1"
 
@@ -67,3 +69,10 @@ gem 'activeadmin'
 gem 'sassc-rails'
 
 gem 'country_select'
+
+gem 'kaminari'
+
+gem 'rabl', '~> 0.16'
+
+
+gem "doorkeeper", "~> 5.8"

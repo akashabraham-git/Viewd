@@ -13,6 +13,7 @@ class ReviewsController < ApplicationController
   def show
     @review = Review.includes(:movie, :member).find(params[:id])
     @rating = Rating.find_by(member: @review.member, movie: @review.movie)&.rating
+    session[:review_return_to] = request.referer
   end
 
   def create
@@ -39,10 +40,18 @@ class ReviewsController < ApplicationController
   end
 
   def destroy
+    return_path = request.referer 
+    deleted_review_url = movie_review_path(@movie, @review)
+
     if @review.destroy
-      redirect_back fallback_location: root_path
+      if return_path.include?(deleted_review_url)
+        return_path = session.delete(:review_return_to) 
+        redirect_to return_path, notice: "Review deleted."
+      else
+        redirect_to return_path, notice: "Review deleted."
+      end
     else
-      redirect_back fallback_location: movie_path(@movie), alert: "#{@review.errors.full_messages.to_sentence}"
+      redirect_back fallback_location: movie_path(@movie), alert: "Could not delete review."
     end
   end
 
