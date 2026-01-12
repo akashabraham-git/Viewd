@@ -14,7 +14,7 @@ class User < ApplicationRecord
            class_name: 'Doorkeeper::AccessToken', 
            foreign_key: :resource_owner_id, 
            dependent: :delete_all
-           
+
   delegate :bio, :country, to: :actable, allow_nil: true
   accepts_nested_attributes_for :actable
 
@@ -63,5 +63,12 @@ class User < ApplicationRecord
   def self.ransackable_associations(auth_object = nil)
     ["actable"]
   end
+
+  
+  def self.authenticate(email, password)
+    user = User.find_for_authentication(email: email)
+    user&.valid_password?(password) ? user : nil
+  end
+
 
 end

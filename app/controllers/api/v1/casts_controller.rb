@@ -4,17 +4,13 @@ module Api
     class CastsController < BaseController
       skip_before_action :doorkeeper_authorize!, only: [:show, :index]
       before_action :set_cast_member, only: [:show, :update, :destroy]
-      #before_action :authorize_moderator!, except: [:show, :index]
+      before_action :authorize_moderator!, except: [:show, :index]
 
-      #skip_before_action :authenticate_user_from_session!, only: [:index, :show]
-
-      # GET /api/v1/casts
       def index
         @casts = Cast.all
         render 'api/v1/casts/index'
       end
 
-      # GET /api/v1/casts/:id
       def show
         @movies = @cast_member.movies.distinct
         @jobs = @cast_member.credits.where(cast_id: @cast_member.id).distinct.pluck(:job)
@@ -23,18 +19,17 @@ module Api
         render 'api/v1/casts/show'
       end
 
-      # POST /api/v1/casts
       def create
         @cast = Cast.new(cast_params)
         
         if @cast.save
+          
           render 'api/v1/casts/show', status: :created
         else
           render_error(@cast.errors.full_messages.to_sentence)
         end
       end
 
-      # PATCH/PUT /api/v1/casts/:id
       def update
         if @cast_member.update(cast_params)
           render 'api/v1/casts/show', status: :ok
@@ -43,7 +38,6 @@ module Api
         end
       end
 
-      # DELETE /api/v1/casts/:id
       def destroy
         @cast_member.destroy
         render_success("Person removed from database", :ok)

@@ -1,10 +1,8 @@
-# app/controllers/api/v1/library_entries_controller.rb
 module Api
   module V1
     class LibraryEntriesController < BaseController
       before_action :set_movie
 
-      # POST /api/v1/movies/:id/toggle_watched
       def toggle_watched
         entry = LibraryEntry.find_or_initialize_by(member: current_user.actable, movie: @movie)
 
@@ -33,7 +31,6 @@ module Api
         end
       end
 
-      # POST /api/v1/movies/:id/toggle_watchlist
       def toggle_watchlist
         entry = LibraryEntry.find_or_initialize_by(member: current_user.actable, movie: @movie)
         entry.in_watchlist = !entry.in_watchlist

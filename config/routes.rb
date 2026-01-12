@@ -1,18 +1,41 @@
 Rails.application.routes.draw do
-  use_doorkeeper
+  use_doorkeeper do
+    skip_controllers :authorizations, :applications, :authorized_applications
+  end
+  
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
       resources :movies do
         member do
-          post :toggle_watched
-          post :toggle_watchlist
+          post :toggle_watched,   to: 'library_entries#toggle_watched'   
+          post :toggle_watchlist, to: 'library_entries#toggle_watchlist'
           post 'like', to: 'likes#toggle_movie_like'
           post 'rating', to: 'ratings#toggle'
         end
+        
+        resources :reviews, only: [:index, :show, :create, :update, :destroy]
       end
 
-      resources :casts
-      resources :genres
+      post 'reviews/:id/like', to: 'likes#toggle_review_like', as: :review_like
+
+      resources :casts, only: [:index, :show, :create, :update, :destroy]
+
+      resources :genres, only: [:index, :show, :create, :update, :destroy]
+
+      resources :users, only: [:show, :update, :destroy] do
+        resources :connections, only: [:index]
+      end
+      
+      resources :connections, only: [:create, :destroy]
+      
+      resources :members, only: [] do
+        member do
+          get :watchlist
+          get :likes
+          get :library
+          get :reviews
+        end
+      end
       
     end
   end

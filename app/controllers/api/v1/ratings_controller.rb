@@ -1,8 +1,6 @@
-# app/controllers/api/v1/ratings_controller.rb
 module Api
   module V1
     class RatingsController < BaseController
-      # POST /api/v1/movies/:id/rating
       def toggle
         @movie = Movie.find_by(id: params[:id])
         return render_error("Movie not found", :not_found) if @movie.nil?

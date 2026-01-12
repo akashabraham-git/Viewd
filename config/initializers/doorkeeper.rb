@@ -1,13 +1,23 @@
 
-
 Doorkeeper.configure do
+  skip_client_authentication_for_password_grant true
   # Change the ORM that doorkeeper will use (requires ORM extensions installed).
   # Check the list of supported ORMs here: https://github.com/doorkeeper-gem/doorkeeper#orms
   orm :active_record
 
-  resource_owner_authenticator do
-    current_user || redirect_to(new_user_session)
+  resource_owner_from_credentials do |_routes|
+    User.authenticate(params[:username], params[:password])
   end
+
+  skip_authorization do
+      true
+  end
+
+  use_refresh_token
+
+  # resource_owner_authenticator do
+  #   current_user || redirect_to(new_user_session)
+  # end
 
 
   # If you didn't skip applications controller from Doorkeeper routes in your application routes.rb
@@ -18,6 +28,11 @@ Doorkeeper.configure do
   admin_authenticator do
     current_user || redirect_to(new_user_session)
   end
+
+  grant_flows %w[password client_credentials]
+
+  allow_blank_redirect_uri true
+
   #   # Put your admin authentication logic here.
   #   # Example implementation:
   #
@@ -366,7 +381,7 @@ Doorkeeper.configure do
   #   https://datatracker.ietf.org/doc/html/rfc6819#section-4.4.2
   #   https://datatracker.ietf.org/doc/html/rfc6819#section-4.4.3
   #
-  # grant_flows %w[authorization_code client_credentials]
+   
 
   # Allows to customize OAuth grant flows that +each+ application support.
   # You can configure a custom block (or use a class respond to `#call`) that must

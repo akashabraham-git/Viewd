@@ -1,57 +1,67 @@
 module Api
   module V1
-    class ReviewsController < ActionController::API
+    class ReviewsController < BaseController
+      skip_before_action :doorkeeper_authorize!, only: [:index, :show]
+      before_action :set_movie
       before_action :set_review, only: [:show, :update, :destroy]
 
       def index
-        if params[:movie_id]
-          @movie = Movie.find(params[:movie_id])
-          @reviews = @movie.reviews.includes(member: :user)
-        elsif params[:user_id]
-          @user = User.find(params[:user_id])
-          @reviews = @user.member.reviews.includes(:movie)
-        else
-          @reviews = Review.all.limit(20)
-        end
+        @reviews = @movie.reviews
+                         .left_joins(:likes)
+                         .group(:id)
+                         .order('COUNT(likes.id) DESC, reviews.created_at DESC')
+                         .includes(member: { profile_picture_attachment: :blob })
+        
+        render 'api/v1/reviews/index'
       end
 
       def show
+        @rating = Rating.find_by(member: @review.member, movie: @review.movie)&.rating
+        render 'api/v1/reviews/show'
       end
 
       def create
-        @movie = Movie.find(params[:movie_id])
-        @review = @movie.reviews.build(review_params)
+        @review = Review.new(review_params.merge(movie: @movie, member: current_user.actable))
+        @review.current_user_instance = current_user
         
         if @review.save
-          render :show, status: :created
+          render 'api/v1/reviews/show', status: :created
         else
-          render json: { errors: @review.errors.full_messages }, status: :unprocessable_entity
+          render_error(@review.errors.full_messages.to_sentence)
         end
       end
 
       def update
         if @review.update(review_params)
-          render :show, status: :ok
+          render 'api/v1/reviews/show', status: :ok
         else
-          render json: { errors: @review.errors.full_messages }, status: :unprocessable_entity
+          render_error(@review.errors.full_messages.to_sentence)
         end
       end
 
       def destroy
-        @review.destroy
-        head :no_content
+        if @review.destroy
+          render_success("Review deleted", :ok)
+        else
+          render_error("Could not delete review")
+        end
       end
 
       private
 
+      def set_movie
+        @movie = Movie.find_by(id: params[:movie_id])
+        return render_error("Movie not found", :not_found) if @movie.nil?
+      end
+
       def set_review
-        @review = Review.find(params[:id])
-      rescue ActiveRecord::RecordNotFound
-        render json: { error: "Review not found" }, status: :not_found
+        @review = Review.find_by(id: params[:id])
+        return render_error("Review not found", :not_found) if @review.nil?
+        @movie = @review.movie
       end
 
       def review_params
-        params.require(:review).permit(:content, :rating, :member_id)
+        params.require(:review).permit(:content)
       end
     end
   end
