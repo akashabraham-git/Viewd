@@ -3,7 +3,7 @@ module Api
     class BaseController < ActionController::API
       include Pagy::Backend
       before_action :doorkeeper_authorize!
-      
+      helper_method :pagy_metadata
       respond_to :json
 
       private

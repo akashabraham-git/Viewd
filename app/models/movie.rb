@@ -16,6 +16,9 @@ class Movie < ApplicationRecord
     unreleased: 1
   }
 
+  validates :title, presence: true
+  validates :synopsis, presence: true, length: { minimum: 10 }
+
   def average_rating
     ratings.average(:rating).to_f.round(1) || 0.0
   end

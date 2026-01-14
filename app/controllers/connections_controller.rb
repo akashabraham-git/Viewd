@@ -1,6 +1,5 @@
 class ConnectionsController < ApplicationController
   before_action :set_me, except: :index
-  before_action :authenticate_user!
   
   def index
     @user = User.find(params[:user_id])

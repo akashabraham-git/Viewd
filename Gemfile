@@ -70,9 +70,12 @@ gem 'sassc-rails'
 
 gem 'country_select'
 
-gem 'kaminari'
-
 gem 'rabl', '~> 0.16'
 
-
 gem "doorkeeper", "~> 5.8"
+
+group :development, :test do
+  gem 'rspec-rails', "~> 8.0.0"
+  gem 'factory_bot_rails'
+  gem "shoulda-matchers"
+end

@@ -28,12 +28,12 @@ module Api
                        .includes(:movie)
         end
 
-        render 'api/v1/users/show'
+        render 'show'
       end
 
       def update
         if @user.update(user_params)
-          render 'api/v1/users/show', status: :ok
+          render 'show', status: :ok
         else
           render_error(@user.errors.full_messages.to_sentence)
         end

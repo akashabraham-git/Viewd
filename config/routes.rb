@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   use_doorkeeper do
     skip_controllers :authorizations, :applications, :authorized_applications
   end
-  
+
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
       resources :movies do
@@ -28,7 +28,7 @@ Rails.application.routes.draw do
       
       resources :connections, only: [:create, :destroy]
       
-      resources :members, only: [] do
+      resources :members do
         member do
           get :watchlist
           get :likes
@@ -36,6 +36,8 @@ Rails.application.routes.draw do
           get :reviews
         end
       end
+
+      resources :moderators
       
     end
   end
