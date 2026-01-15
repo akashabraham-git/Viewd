@@ -13,8 +13,10 @@ Rails.application.routes.draw do
           post 'rating', to: 'ratings#toggle'
         end
         
-        resources :reviews, only: [:index, :show, :create, :update, :destroy]
+        resources :reviews, only: [:index, :show, :create]
       end
+
+      resources :reviews, only: [:show, :update, :destroy]
 
       post 'reviews/:id/like', to: 'likes#toggle_review_like', as: :review_like
 
@@ -38,6 +40,8 @@ Rails.application.routes.draw do
       end
 
       resources :moderators
+
+      resources :memberships, only: [:index, :update, :show]
       
     end
   end

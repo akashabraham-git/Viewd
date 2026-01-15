@@ -1,7 +1,7 @@
 module Api
   module V1
     class LikesController < BaseController
-      before_action :set_movie
+      before_action :set_movie, only: :toggle_movie_like
 
       def toggle_movie_like
         like = @movie.likes.find_by(member: current_user.actable)
@@ -49,7 +49,7 @@ module Api
       private
 
       def set_movie
-        movie_id = params[:movie_id] || params[:id]
+        movie_id = params[:movie_id] || params[:id] 
         @movie = Movie.find_by(id: movie_id)
         return render_error("Movie not found", :not_found) if @movie.nil?
       end

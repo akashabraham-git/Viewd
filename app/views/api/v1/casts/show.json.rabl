@@ -1,4 +1,4 @@
-object @cast => :cast
+object @cast_member => :cast
 
 attributes :id, :name, :pic, :bio
 

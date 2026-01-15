@@ -2,8 +2,10 @@ module Api
   module V1
     class ReviewsController < BaseController
       skip_before_action :doorkeeper_authorize!, only: [:index, :show]
-      before_action :set_movie
+      before_action :set_movie, only: [:index, :create]
       before_action :set_review, only: [:show, :update, :destroy]
+      before_action :authorize_member!, only: :create
+      before_action :authorize_owner!, only: [:update, :destroy]
 
       def index
         @reviews = @movie.reviews
@@ -40,6 +42,7 @@ module Api
       end
 
       def destroy
+        
         if @review.destroy
           render_success("Review deleted", :ok)
         else
@@ -58,6 +61,18 @@ module Api
         @review = Review.find_by(id: params[:id])
         return render_error("Review not found", :not_found) if @review.nil?
         @movie = @review.movie
+      end
+
+      def authorize_member!
+        if current_user&.actable_type == 'Moderator'
+          render json: { error: "Only Members can do that." }, status: :forbidden
+        end
+      end
+
+      def authorize_owner!
+        unless current_user.actable == @review.member
+          render json: { error: "Only review owner can do that." }, status: :forbidden
+        end
       end
 
       def review_params

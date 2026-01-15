@@ -1,10 +1,9 @@
-# app/controllers/api/v1/connections_controller.rb
 module Api
   module V1
     class ConnectionsController < BaseController
       before_action :set_me, except: :index
+      skip_before_action :doorkeeper_authorize!, only: :index
 
-      # GET /api/v1/users/:user_id/connections
       def index
         @user = User.find_by(id: params[:user_id])
         return render_error("User not found", :not_found) if @user.nil?

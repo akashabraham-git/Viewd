@@ -3,8 +3,8 @@ module Api
   module V1
     class MembersController < BaseController
       before_action :set_member, except: :create
-      before_action :check_member_type, except: :create
-      skip_before_action :doorkeeper_authorize!, only: [:create, :show]
+      before_action :check_member_type, only: :update
+      skip_before_action :doorkeeper_authorize!, except: :update
 
       def show
         render 'show'
@@ -27,13 +27,8 @@ module Api
         end
       end
 
-      def destroy
-        @member.destroy
-        render_success("Member deleted", :ok)
-      end
-
       def watchlist
-        @entries = current_user.actable.library_entries
+        @entries = @member.library_entries
                               .where(in_watchlist: true)
                               .includes(:movie)
                               .order(updated_at: :desc)
@@ -43,14 +38,14 @@ module Api
 
       def likes
         @liked_movies = Movie.joins(:likes)
-                            .where(likes: { member_id: current_user.actable_id })
-                            .order('likes.created_at DESC')
+                      .where(likes: { member_id: @member.id })
+                      .order('likes.created_at DESC')
         
         render 'likes'
       end
 
       def library
-        @entries = current_user.actable.library_entries
+        @entries = @member.library_entries
                               .where.not(watched_date: nil)
                               .includes(:movie)
                               .order(watched_date: :desc)
@@ -59,7 +54,7 @@ module Api
       end
 
       def reviews
-        @reviews = current_user.actable.reviews
+        @reviews = @member.reviews
                               .includes(:movie)
                               .order(created_at: :desc)
         

@@ -1,4 +1,3 @@
-# app/controllers/api/v1/casts_controller.rb
 module Api
   module V1
     class CastsController < BaseController
@@ -7,8 +6,13 @@ module Api
       before_action :authorize_moderator!, except: [:show, :index]
 
       def index
-        @casts = Cast.all
-        render 'api/v1/casts/index'
+
+        @pagy, @casts = pagy(
+          Cast.all,
+          page: params[:page],
+          limit: params[:per_page]
+        )
+        render 'index'
       end
 
       def show
@@ -16,15 +20,15 @@ module Api
         @jobs = @cast_member.credits.where(cast_id: @cast_member.id).distinct.pluck(:job)
         @grouped_credits = @cast_member.credits.includes(:movie).group_by(&:job)
         
-        render 'api/v1/casts/show'
+        render 'show'
       end
 
       def create
-        @cast = Cast.new(cast_params)
+        @cast_member = Cast.new(cast_params)
         
-        if @cast.save
+        if @cast_member.save
           
-          render 'api/v1/casts/show', status: :created
+          render 'show', status: :created
         else
           render_error(@cast.errors.full_messages.to_sentence)
         end
@@ -32,7 +36,7 @@ module Api
 
       def update
         if @cast_member.update(cast_params)
-          render 'api/v1/casts/show', status: :ok
+          render 'show', status: :ok
         else
           render_error(@cast_member.errors.full_messages.to_sentence)
         end
