@@ -23,4 +23,17 @@ RSpec.describe Movie, type: :model do
     it { should have_and_belong_to_many(:genres) }
     it { should have_many(:credits).dependent(:destroy) }
   end
+
+  describe "admin search configuration" do
+    it "defines ransackable attributes" do
+      attributes = Movie.ransackable_attributes
+      expect(attributes).to match_array(["title", "status", "language", "release_date", "runtime", "tmdb_id", "created_at"])
+    end
+
+    it "defines ransackable associations" do
+      associations = Movie.ransackable_associations
+      expect(associations).to match_array(["genres", "casts", "credits"])
+    end
+  end
+
 end

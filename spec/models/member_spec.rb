@@ -19,4 +19,17 @@ RSpec.describe Member, type: :model do
       expect(member).not_to be_valid 
     end
   end
+  
+  describe "admin search configuration" do
+    it "defines ransackable attributes" do
+      attributes = Member.ransackable_attributes
+      expect(attributes).to match_array(["id", "bio", "country", "created_at"])
+    end
+
+    it "defines ransackable associations" do
+      associations = Member.ransackable_associations
+      expect(associations).to match_array(["user", "membership", "following", "followers", "active_connections"])
+    end
+  end
+
 end

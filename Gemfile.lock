@@ -129,6 +129,7 @@ GEM
       responders
       warden (~> 1.2.3)
     diff-lcs (1.6.2)
+    docile (1.4.1)
     doorkeeper (5.8.2)
       railties (>= 5)
     drb (2.2.3)
@@ -388,6 +389,12 @@ GEM
       websocket (~> 1.0)
     shoulda-matchers (7.0.1)
       activesupport (>= 7.1)
+    simplecov (0.22.0)
+      docile (~> 1.1)
+      simplecov-html (~> 0.11)
+      simplecov_json_formatter (~> 0.1)
+    simplecov-html (0.13.2)
+    simplecov_json_formatter (0.1.4)
     sprockets (4.2.2)
       concurrent-ruby (~> 1.0)
       logger
@@ -454,7 +461,6 @@ DEPENDENCIES
   httparty
   importmap-rails
   jbuilder
-  kaminari
   pagy (~> 9.0)
   pg (~> 1.1)
   puma (>= 5.0)
@@ -465,6 +471,7 @@ DEPENDENCIES
   sassc-rails
   selenium-webdriver
   shoulda-matchers
+  simplecov
   sprockets-rails
   stimulus-rails
   turbo-rails

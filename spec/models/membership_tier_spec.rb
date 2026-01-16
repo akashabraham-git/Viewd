@@ -18,4 +18,16 @@ RSpec.describe MembershipTier, type: :model do
     end
   end
 
+  describe "admin search configuration" do
+    it "defines ransackable attributes" do
+      attributes = MembershipTier.ransackable_attributes
+      expect(attributes).to match_array(["name", "price", "country", "id", "badge"])
+    end
+
+    it "defines ransackable associations" do
+      associations = MembershipTier.ransackable_associations
+      expect(associations).to match_array(["memberships"])
+    end
+  end
+
 end

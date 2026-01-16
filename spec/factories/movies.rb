@@ -1,7 +1,8 @@
 FactoryBot.define do
   factory :movie do
-    title { "Inception" }
-    release_date { "2010-07-16" }
-    status { :released } 
+    sequence(:title) { |n| "Movie Title #{n}" }
+    synopsis { "This is a detailed synopsis that is at least ten characters long." }
+    release_date { Date.today }
+    status { :released }
   end
 end

@@ -21,4 +21,14 @@ RSpec.describe Rating, type: :model do
       expect(entry.watched_date).to eq(Date.today)
     end
   end
+
+  describe "admin search configuration" do
+    it "defines ransackable attributes" do
+      expect(Rating.ransackable_attributes).to match_array(["id", "rating", "created_at", "movie_id", "member_id"])
+    end
+
+    it "defines ransackable associations" do
+      expect(Rating.ransackable_associations).to match_array(["member", "movie"])
+    end
+  end
 end

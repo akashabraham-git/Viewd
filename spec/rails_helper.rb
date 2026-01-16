@@ -1,4 +1,13 @@
-# This file is copied to spec/ when you run 'rails generate rspec:install'
+require 'simplecov'
+SimpleCov.start 'rails' do
+  add_group "Controllers", "app/controllers"
+  add_group "Models", "app/models"
+  
+  add_filter "/bin/"
+  add_filter "/db/"
+  add_filter "/spec/"
+end
+
 require 'spec_helper'
 
 require "action_view"

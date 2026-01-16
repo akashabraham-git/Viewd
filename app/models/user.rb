@@ -66,5 +66,5 @@ class User < ApplicationRecord
     user&.valid_password?(password) ? user : nil
   end
 
-
+  
 end

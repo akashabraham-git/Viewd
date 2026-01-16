@@ -8,4 +8,16 @@ RSpec.describe LibraryEntry, type: :model do
       expect(entry.errors[:base]).to include("Entry must either be in watchlist or have a watched date")
     end
   end
+
+  describe "admin search configuration" do
+    it "defines ransackable attributes" do
+      attributes = LibraryEntry.ransackable_attributes
+      expect(attributes).to match_array(["id", "in_watchlist", "watched_date" , "movie_id", "member_id"])
+    end
+
+    it "defines ransackable associations" do
+      associations = LibraryEntry.ransackable_associations
+      expect(associations).to match_array(["member", "movie"])
+    end
+  end
 end

@@ -21,4 +21,14 @@ RSpec.describe Like, type: :model do
     end
   end
 
+  describe "admin search configuration" do
+    it "defines ransackable attributes" do
+      expect(Like.ransackable_attributes).to match_array(["id", "likeable_type", "likeable_id"])
+    end
+
+    it "defines ransackable associations" do
+      expect(Like.ransackable_associations).to match_array(["member", "likeable"])
+    end
+  end
+
 end

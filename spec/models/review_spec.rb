@@ -13,4 +13,14 @@ RSpec.describe Review, type: :model do
     it { should belong_to(:member) }
     it { should belong_to(:movie) }
   end
+
+  describe "admin search configuration" do
+    it "defines ransackable attributes" do
+      expect(Review.ransackable_attributes).to match_array(["id", "content", "created_at", "movie_id", "member_id"])
+    end
+
+    it "defines ransackable associations" do
+      expect(Review.ransackable_associations).to match_array(["member", "movie"])
+    end
+  end
 end
