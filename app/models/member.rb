@@ -26,7 +26,7 @@ class Member < ApplicationRecord
     brazil: 9 
   }
 
-  validates :bio, length: { maximum: 500 }
+  validates :bio, length: { maximum: 500 }, presence: true
   
   after_create :assign_default_membership
 

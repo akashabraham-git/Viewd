@@ -1,57 +1,47 @@
 module Api
   module V1
     class LikesController < BaseController
-      before_action :set_movie, only: :toggle_movie_like
+      before_action :set_movie, only: [:create_movie_like, :destroy_movie_like]
+      before_action :set_review, only: [:create_review_like, :destroy_review_like]
 
-      def toggle_movie_like
-        like = @movie.likes.find_by(member: current_user.actable)
-
-        if like
-          like.destroy
-          render json: { 
-            message: "Movie unliked", 
-            liked: false,
-            likes_count: @movie.likes.count 
-          }, status: :ok
-        else
-          @movie.likes.create!(member: current_user.actable)
-          render json: { 
-            message: "Movie liked", 
-            liked: true,
-            likes_count: @movie.likes.count 
-          }, status: :ok
-        end
+      def create_movie_like
+        like = @movie.likes.find_or_create_by!(member: current_user.actable)
+        render_like_status(@movie, "Movie liked", true)
       end
 
-      def toggle_review_like
-        @review = Review.find_by(id: params[:id])
-        return render_error("Review not found", :not_found) if @review.nil?
+      def destroy_movie_like
+        @movie.likes.where(member: current_user.actable).destroy_all
+        render_like_status(@movie, "Movie unliked", false)
+      end
 
-        @like = @review.likes.find_by(member: current_user.actable)
+      def create_review_like
+        @review.likes.find_or_create_by!(member: current_user.actable)
+        render_like_status(@review, "Review liked", true)
+      end
 
-        if @like
-          @like.destroy
-          render json: { 
-            message: "Review unliked", 
-            liked: false,
-            likes_count: @review.likes.count 
-          }, status: :ok
-        else
-          @review.likes.create(member: current_user.actable)
-          render json: { 
-            message: "Review liked", 
-            liked: true,
-            likes_count: @review.likes.count 
-          }, status: :ok
-        end
+      def destroy_review_like
+        @review.likes.where(member: current_user.actable).destroy_all
+        render_like_status(@review, "Review unliked", false)
       end
 
       private
 
+      def render_like_status(likeable, message, liked)
+        render json: { 
+          message: message, 
+          liked: liked,
+          likes_count: likeable.likes.count 
+        }, status: :ok
+      end
+
       def set_movie
-        movie_id = params[:movie_id] || params[:id] 
-        @movie = Movie.find_by(id: movie_id)
-        return render_error("Movie not found", :not_found) if @movie.nil?
+        @movie = Movie.find_by(id: params[:id])
+        return render_error("Movie not found", :not_found) unless @movie
+      end
+
+      def set_review
+        @review = Review.find_by(id: params[:id])
+        return render_error("Review not found", :not_found) unless @review
       end
     end
   end

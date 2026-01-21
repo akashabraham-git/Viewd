@@ -1,31 +1,52 @@
 module Api
   module V1
     class RatingsController < BaseController
-      def toggle
-        @movie = Movie.find_by(id: params[:id])
-        return render_error("Movie not found", :not_found) if @movie.nil?
+      before_action :set_movie
 
+      def create
         score = params[:rating].to_i
+        return render_error("Invalid rating score", :unprocessable_content) if score <= 0
 
-        existing_rating = Rating.find_by(member: current_user.actable, movie: @movie)
+        @rating = Rating.new(member: current_user.actable, movie: @movie, rating: score)
+        @rating.current_user_instance = current_user
+        
+        if @rating.save
+          render_success("Rating created", :created)
+        else
+          render_error(@rating.errors.full_messages.to_sentence)
+        end
+      end
 
-        if existing_rating && (score == 0 || existing_rating.rating == score)
-          existing_rating.destroy
+      def update
+        score = params[:rating].to_i
+        @rating = Rating.find_by(member: current_user.actable, movie: @movie)
+        
+        return render_error("Rating not found", :not_found) unless @rating
+        return render_error("Invalid rating score", :unprocessable_content) if score <= 0
+
+        @rating.current_user_instance = current_user
+        if @rating.update(rating: score)
+          render_success("Rating updated", :ok)
+        else
+          render_error(@rating.errors.full_messages.to_sentence)
+        end
+      end
+
+      def destroy
+        rating = Rating.find_by(member: current_user.actable, movie: @movie)
+        
+        if rating&.destroy
           render_success("Rating removed", :ok, { rated: false })
         else
-          rating_record = Rating.find_or_initialize_by(member: current_user.actable, movie: @movie)
-          rating_record.current_user_instance = current_user
-          
-          if rating_record.update(rating: score)
-            render json: { 
-              message: "Rating saved", 
-              rating: rating_record.rating,
-              rated: true 
-            }, status: :ok
-          else
-            render_error(rating_record.errors.full_messages.to_sentence)
-          end
+          render_success("No rating found to remove", :ok, { rated: false })
         end
+      end
+
+      private
+
+      def set_movie
+        @movie = Movie.find_by(id: params[:id])
+        return render_error("Movie not found", :not_found) if @movie.nil?
       end
     end
   end

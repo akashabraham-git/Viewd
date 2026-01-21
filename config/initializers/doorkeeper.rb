@@ -9,11 +9,14 @@ Doorkeeper.configure do
     User.authenticate(params[:username], params[:password])
   end
 
-  skip_authorization do
-      true
-  end
-
   use_refresh_token
+
+  default_scopes  :public
+  optional_scopes :read, :write, :admin
+
+  resource_owner_authenticator do
+  current_user || warden.authenticate!(scope: :user)
+end
 
   # resource_owner_authenticator do
   #   current_user || redirect_to(new_user_session)
@@ -29,7 +32,7 @@ Doorkeeper.configure do
     current_user || redirect_to(new_user_session)
   end
 
-  grant_flows %w[password client_credentials]
+  grant_flows %w[password client_credentials authorization_code]
 
   allow_blank_redirect_uri true
 

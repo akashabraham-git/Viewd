@@ -10,6 +10,7 @@ class Movie < ApplicationRecord
 
   scope :recent, -> { where('release_date > ?', 1.year.ago) }
   scope :released, -> { where(status: 'released') }
+  scope :popular, -> { released.left_joins(:likes).group(:id).order('COUNT(likes.id) DESC') }
 
   enum :status, {
     released: 0,
@@ -22,6 +23,13 @@ class Movie < ApplicationRecord
   def average_rating
     ratings.average(:rating).to_f.round(1) || 0.0
   end
+
+  def self.recommended_for(member)
+        favorite_genre_ids = member.likes.where(likeable_type: 'Movie')
+                                  .joins("JOIN genres_movies ON likes.likeable_id = genres_movies.movie_id").pluck(:genre_id).uniq
+
+        released.recent.joins(:genres).where(genres: { id: favorite_genre_ids }).where.not(id: member.library_entries.pluck(:movie_id)).distinct
+      end
 
   def self.ransackable_attributes(auth_object = nil)
     ["title", "status", "language", "release_date", "runtime", "tmdb_id", "created_at"]

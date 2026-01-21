@@ -20,7 +20,7 @@ class User < ApplicationRecord
 
   before_validation :normalize_username, :normalize_email
   before_create :normalize_name
-  after_commit :send_welcome_email, on: :create
+  # after_commit :send_welcome_email, on: :create
 
   scope :member, -> { where('actable_type ILIKE ?', "member") }
   scope :moderator, -> { where('actable_type ILIKE ?', "moderator") }
@@ -37,9 +37,9 @@ class User < ApplicationRecord
     self.name = name.squish.titleize if name.present?
   end
 
-  def send_welcome_email
-    puts "Welcome mail sent to #{email}"
-  end
+  # def send_welcome_email
+  #   puts "Welcome mail sent to #{email}"
+  # end
 
   def actable_attributes=(attributes)
     if self.actable_type.nil? || self.actable_type == 'Member'

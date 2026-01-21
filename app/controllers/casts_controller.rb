@@ -22,7 +22,7 @@ class CastsController < ApplicationController
       redirect_to casts_path, notice: "Person added successfully."
     else
       flash.now[:alert] =  @cast.errors.full_messages.to_sentence
-      render :new, status: :unprocessable_entity
+      render :new, status: :unprocessable_content
     end
   end
 
@@ -34,7 +34,7 @@ class CastsController < ApplicationController
       redirect_to cast_path(@cast_member), notice: "Updated successfully."
     else
       flash.now[:alert] =  @cast_member.errors.full_messages.to_sentence
-      render :edit, status: :unprocessable_entity
+      render :edit, status: :unprocessable_content
     end
   end
 

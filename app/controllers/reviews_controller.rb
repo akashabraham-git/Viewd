@@ -41,7 +41,7 @@ class ReviewsController < ApplicationController
 
   def destroy
     return_path = request.referer 
-    deleted_review_url = movie_review_path(@movie, @review)
+    deleted_review_url = review_path(@review)
 
     if @review.destroy
       if return_path.include?(deleted_review_url)

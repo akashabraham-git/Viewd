@@ -20,13 +20,10 @@ module Api
           has_review = Review.exists?(member: current_user.actable, movie: @movie)
 
           if has_rating || has_review
-            render_error("Can't be removed from your films since there's an activity in it", :unprocessable_entity)
+            render_error("Can't be removed from your films since there's an activity in it", :unprocessable_content)
           else
-            entry.update(watched_date: nil)
-            render json: { 
-              message: "Removed from watched films", 
-              watched: false 
-            }, status: :ok
+            entry.destroy
+            render json: { message: "Removed from watched films", watched: false }, status: :ok
           end
         end
       end

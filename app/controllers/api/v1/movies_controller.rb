@@ -27,7 +27,7 @@ module Api
         if @movie.save
           render 'show', status: :created
         else
-          render_error(@movie.errors.full_messages.to_sentence, :unprocessable_entity)
+          render_error(@movie.errors.full_messages.to_sentence, :unprocessable_content)
         end
       end
 
@@ -35,7 +35,7 @@ module Api
         if @movie.update(movie_params)
           render 'show', status: :ok
         else
-          render_error(@movie.errors.full_messages.to_sentence, :unprocessable_entity)
+          render_error(@movie.errors.full_messages.to_sentence, :unprocessable_content)
         end
       end
 
@@ -45,6 +45,32 @@ module Api
         else
           render_error(@movie.errors.full_messages.to_sentence)
         end
+      end
+
+      def discover
+        @movies = Movie.released
+
+        case params[:mode]
+        when 'new'
+          @movies = @movies.recent
+        when 'top'
+          @movies = @movies.joins(:ratings)
+                          .group(:id)
+                          .order('AVG(ratings.rating) DESC')
+        end
+
+     
+        render json: @movies.limit(20)
+      end
+
+      def recommend
+        if current_user&.actable_type == 'Member'
+          @movies = Movie.recommended_for(current_user.actable).limit(10)
+        else
+          @movies = Movie.released.recent.limit(10)
+        end
+
+        render json: @movies
       end
 
       private

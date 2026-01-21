@@ -1,16 +1,25 @@
 Rails.application.routes.draw do
-  use_doorkeeper do
-    skip_controllers :authorizations, :applications, :authorized_applications
-  end
+  use_doorkeeper 
 
   namespace :api, defaults: { format: :json } do
     namespace :v1 do
       resources :movies do
         member do
-          post :toggle_watched,   to: 'library_entries#toggle_watched'   
-          post :toggle_watchlist, to: 'library_entries#toggle_watchlist'
-          post 'like', to: 'likes#toggle_movie_like'
-          post 'rating', to: 'ratings#toggle'
+          patch :toggle_watched, to: 'library_entries#toggle_watched'   
+          patch :toggle_watchlist, to: 'library_entries#toggle_watchlist'
+          
+          post :like, to: 'likes#create_movie_like'
+          delete :like, to: 'likes#destroy_movie_like'
+          
+          post   :rating, to: 'ratings#create'
+          patch  :rating, to: 'ratings#update'
+          delete :rating, to: 'ratings#destroy'
+        end
+
+
+        collection do
+          get :discover 
+          get :recommend
         end
         
         resources :reviews, only: [:index, :show, :create]
@@ -18,7 +27,8 @@ Rails.application.routes.draw do
 
       resources :reviews, only: [:show, :update, :destroy]
 
-      post 'reviews/:id/like', to: 'likes#toggle_review_like', as: :review_like
+      post 'reviews/:id/like', to: 'likes#create_review_like', as: :review_like_create
+      delete 'reviews/:id/like', to: 'likes#destroy_review_like', as: :review_like_destroy
 
       resources :casts, only: [:index, :show, :create, :update, :destroy]
 
@@ -83,7 +93,9 @@ Rails.application.routes.draw do
     resources :library_entries, only: [:create, :update, :destroy]
   end
 
-  resources :users, except: [:index]
+  resources :users, except: [:index] do
+    resources :connections,   only: [:index]
+  end
 
   resources :members, only: [] do
     member do
@@ -94,10 +106,12 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :reviews, only: [:show, :update, :destroy, :edit]
+
   resources :casts
   resources :genres
   resources :memberships, only: [:index, :update]
-  resources :connections,   only: [:index, :create, :destroy]
+  resources :connections,   only: [:create, :destroy]
 
 
 end

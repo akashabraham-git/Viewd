@@ -30,7 +30,7 @@ module Api
           
           render 'show', status: :created
         else
-          render_error(@cast.errors.full_messages.to_sentence)
+          render_error(@cast_member.errors.full_messages.to_sentence)
         end
       end
 
