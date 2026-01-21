@@ -1,4 +1,5 @@
 class Review < ApplicationRecord
+  acts_as_paranoid
 
   belongs_to :member
   belongs_to :movie

@@ -1,4 +1,6 @@
 class Member < ApplicationRecord
+  acts_as_paranoid
+  
   has_one :user, as: :actable, dependent: :destroy
   has_one :membership, dependent: :destroy
   has_one :membership_tier, through: :membership

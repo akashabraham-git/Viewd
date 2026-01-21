@@ -43,7 +43,7 @@
   <hr style="border: 0; border-top: 1px solid #2c3440; margin: 25px 0;">
 
   <%# --- ROLE TOGGLE BOX --- %>
-  <div style="background: #2c3440; padding: 15px; border-radius: 4px; text-align: center;">
+  <div style="background: #2c3440; padding: 15px; border-radius: 4px; text-align: center; margin-bottom: 20px;">
     <% if params[:role] == 'moderator' %>
       <p style="color: #9ab; margin: 0 0 10px 0; font-size: 0.9rem;">Not a Moderator?</p>
       <%= link_to "Standard User Login", new_user_session_path, style: "color: #00e054; text-decoration: none; font-weight: bold;" %>
@@ -51,6 +51,13 @@
       <p style="color: #9ab; margin: 0 0 10px 0; font-size: 0.9rem;">Are you a Moderator?</p>
       <%= link_to "Go to Moderator Login", new_user_session_path(role: 'moderator'), style: "color: #00e054; text-decoration: none; font-weight: bold;" %>
     <% end %>
+  </div>
+
+  <%# --- ACCOUNT RECOVERY SECTION --- %>
+  <div style="background: rgba(0, 224, 84, 0.05); border: 1px dashed #00e054; padding: 15px; border-radius: 4px; text-align: center;">
+    <p style="color: #9ab; margin: 0 0 5px 0; font-size: 0.85rem;">Previously deleted your account?</p>
+    <%= link_to "Recover Account", new_password_path(resource_name), style: "color: #00e054; text-decoration: none; font-weight: bold; font-size: 0.9rem;" %>
+    <p style="color: #678; margin: 5px 0 0 0; font-size: 0.7rem;">(Restores access within 1 year of deletion)</p>
   </div>
 
   <div style="text-align: center; margin-top: 20px; font-size: 0.85rem;">

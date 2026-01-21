@@ -95,7 +95,7 @@ ActiveAdmin.register Movie do
 
   batch_action :mark_as_released do |ids|
     batch_action_collection.find(ids).each do |movie|
-      movie.update(status: 'released', release_date: Date.today)
+      movie.update!(status: :released, release_date: Date.today)
     end
     redirect_to collection_path, notice: "Selected movies marked as released!"
   end

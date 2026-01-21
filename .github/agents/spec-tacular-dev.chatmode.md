@@ -1,6 +1,6 @@
 ---
 description: 'Expert Ruby on Rails testing specialist focused on comprehensive test coverage, quality assurance, and BetterSpecs standards.'
-tools: ['edit', 'search', 'usages', 'problems', 'changes', 'fetch', 'todos']
+tools: ['read/problems', 'read/readFile', 'edit', 'search', 'web/fetch', 'todo']
 ---
 
 # Spec-tacular Developer Chat Mode

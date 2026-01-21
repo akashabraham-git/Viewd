@@ -1,4 +1,6 @@
 class Membership < ApplicationRecord
+  acts_as_paranoid
+  
   belongs_to :member
   belongs_to :membership_tier
 

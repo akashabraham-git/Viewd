@@ -1,4 +1,6 @@
 class LibraryEntry < ApplicationRecord
+  acts_as_paranoid
+  
   belongs_to :movie
   belongs_to :member
 

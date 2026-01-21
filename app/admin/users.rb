@@ -11,9 +11,23 @@ ActiveAdmin.register User do
   scope :all, default: true
   scope :member
   scope :moderator
+  scope "Deleted", :only_deleted
 
   config.remove_action_item(:new) 
   actions :all, except: [:new, :create]
+
+  action_item :restore, only: :show, if: proc { resource.deleted? } do
+    link_to "Restore User", restore_admin_user_path(resource), method: :put
+  end
+
+  member_action :restore, method: :put do
+    resource = User.with_deleted.find(params[:id])
+    if resource.recover
+      redirect_to admin_user_path(resource), notice: "User has been successfully restored!"
+    else
+      redirect_to admin_user_path(resource), alert: "Failed to restore user."
+    end
+  end
 
   index do
     selectable_column
@@ -23,7 +37,11 @@ ActiveAdmin.register User do
     column :name
     column :actable_type if params[:scope] == 'all'
     column :created_at
-    actions
+    actions do |user|
+      if user.deleted?
+        item "Restore", restore_admin_user_path(user), method: :put, class: "member_link"
+      end
+    end
   end
 
   show do
@@ -63,6 +81,10 @@ ActiveAdmin.register User do
   end
 
   controller do
+    def scoped_collection
+      super.with_deleted
+    end
+
     def update
       if params[:user][:password].blank? && params[:user][:password_confirmation].blank?
         params[:user].delete(:password)

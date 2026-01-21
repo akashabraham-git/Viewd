@@ -1,4 +1,7 @@
 class Connection < ApplicationRecord
+
+  acts_as_paranoid
+  
   belongs_to :follower, class_name: "Member"
   belongs_to :following, class_name: "Member"
 

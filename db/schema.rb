@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_01_20_093532) do
+ActiveRecord::Schema[7.2].define(version: 2026_01_21_191402) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -82,6 +82,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_20_093532) do
     t.datetime "updated_at", null: false
     t.bigint "follower_id"
     t.bigint "following_id"
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_connections_on_deleted_at"
     t.index ["follower_id"], name: "index_connections_on_follower_id"
     t.index ["following_id"], name: "index_connections_on_following_id"
   end
@@ -118,6 +120,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_20_093532) do
     t.datetime "updated_at", null: false
     t.boolean "in_watchlist", default: false
     t.bigint "member_id"
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_library_entries_on_deleted_at"
     t.index ["member_id"], name: "index_library_entries_on_member_id"
     t.index ["movie_id"], name: "index_library_entries_on_movie_id"
   end
@@ -128,6 +132,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_20_093532) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "member_id"
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_likes_on_deleted_at"
     t.index ["likeable_type", "likeable_id"], name: "index_likes_on_likeable"
     t.index ["member_id"], name: "index_likes_on_member_id"
   end
@@ -137,6 +143,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_20_093532) do
     t.integer "country"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_members_on_deleted_at"
   end
 
   create_table "membership_tiers", force: :cascade do |t|
@@ -159,6 +167,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_20_093532) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "member_id"
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_memberships_on_deleted_at"
     t.index ["member_id"], name: "index_memberships_on_member_id"
     t.index ["membership_tier_id"], name: "index_memberships_on_membership_tier_id"
   end
@@ -232,6 +242,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_20_093532) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "member_id"
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_ratings_on_deleted_at"
     t.index ["member_id"], name: "index_ratings_on_member_id"
     t.index ["movie_id"], name: "index_ratings_on_movie_id"
   end
@@ -242,6 +254,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_20_093532) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "member_id"
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_reviews_on_deleted_at"
     t.index ["member_id"], name: "index_reviews_on_member_id"
     t.index ["movie_id"], name: "index_reviews_on_movie_id"
   end
@@ -258,6 +272,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_20_093532) do
     t.string "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
+    t.datetime "deleted_at"
+    t.index ["deleted_at"], name: "index_users_on_deleted_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
