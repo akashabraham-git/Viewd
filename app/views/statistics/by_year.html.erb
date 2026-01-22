@@ -15,8 +15,10 @@
     <%= link_to "ALL TIME", statistics_path, 
         style: "background: #2c3440; color: #fff; padding: 10px 20px; border-radius: 4px; text-decoration: none; border: 1px solid #456;" %>
     <% @available_years.each do |year| %>
+      <% bg_color = year == @year_stats[:year] ? '#00e054' : '#2c3440' %>
+      <% text_color = year == @year_stats[:year] ? '#000' : '#fff' %>
       <%= link_to year, statistics_by_year_path(year: year), 
-          style: "background: <%= year == @year_stats[:year] ? '#00e054; color: #000;' : '#2c3440; color: #fff;' %> padding: 10px 20px; border-radius: 4px; text-decoration: none; border: 1px solid #456; font-weight: bold;" %>
+          style: "background: #{bg_color}; color: #{text_color}; padding: 10px 20px; border-radius: 4px; text-decoration: none; border: 1px solid #456; font-weight: bold;" %>
     <% end %>
   </div>
 

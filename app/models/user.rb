@@ -95,32 +95,29 @@ class User < ApplicationRecord
   end
 
   def self.reset_password_by_token(attributes = {})
-    # Use our custom with_reset_password_token which uses 'unscoped'
-    recoverable = with_reset_password_token(attributes[:reset_password_token])
+    token = attributes[:reset_password_token]
+    recoverable = with_reset_password_token(token)
 
-    if recoverable && recoverable.persisted?
+    if recoverable&.persisted?
       if recoverable.reset_password_period_valid?
-        # IMPORTANT: Manually recover the user BEFORE super tries to save the password
-        # because acts_as_paranoid will block the password update if they are still 'deleted'
         recoverable.recover if recoverable.deleted?
-        
         recoverable.reset_password(attributes[:password], attributes[:password_confirmation])
       else
         recoverable.errors.add(:reset_password_token, :expired)
       end
+      return recoverable
     end
-
-    recoverable || new
+    new
   end
 
 
   def destroy
-    actable_type == 'Moderator' ? really_destroy! : super
+    actable_type == 'Moderator' ? destroy_fully! : update_column(:deleted_at, Time.current)
   end
 
   def recover
     if deleted_at.present? && deleted_at > 1.year.ago
-      super(recursive: true)
+      self.class.unscoped { super(recursive: true) }
       true
     else
       false  

@@ -1,6 +1,15 @@
 # Additional translations at https://github.com/heartcombo/devise/wiki/I18n
 
 en:
+  deleted_account_expired: "Your account was deleted more than a year ago and cannot be recovered."
+  activerecord:
+    errors:
+      models:
+        user:
+          attributes:
+            base:
+              deleted_account_expired: "Your account was deleted more than a year ago and cannot be recovered."
+
   devise:
     confirmations:
       confirmed: "Your email address has been successfully confirmed."
@@ -56,6 +65,7 @@ en:
       unlocked: "Your account has been unlocked successfully. Please sign in to continue."
   errors:
     messages:
+      deleted_account_expired: "Your account was deleted more than a year ago and cannot be recovered."
       already_confirmed: "was already confirmed, please try signing in"
       confirmation_period_expired: "needs to be confirmed within %{period}, please request a new one"
       expired: "has expired, please request a new one"

@@ -19,6 +19,15 @@ RSpec.describe Like, type: :model do
       like = create(:like, :for_review, likeable: review)
       expect(like.associated_movie).to eq(movie) 
     end
+
+    it "returns nil when the likeable_type is neither Movie nor Review (implicit else branch)" do
+      movie = create(:movie)
+      like = create(:like, :for_movie, likeable: movie)
+      # Update to an unknown type without triggering validations
+      like.update_column(:likeable_type, 'UnknownType')
+      like.update_column(:likeable_id, 999)
+      expect(like.associated_movie).to be_nil
+    end
   end
 
   describe "admin search configuration" do
