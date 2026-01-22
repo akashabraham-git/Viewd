@@ -63,6 +63,9 @@ Rails.application.routes.draw do
     registrations: 'users/registrations' 
   }
 
+  get 'statistics', to: 'statistics#index', as: :statistics
+  get 'statistics/:year', to: 'statistics#by_year', as: :statistics_by_year
+
   root "movies#index"
   
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
