@@ -75,7 +75,7 @@ RSpec.describe "Api::V1::Reviews", type: :request do
       expect(response).to have_http_status(:forbidden)
     end
 
-    it "returns 422 and hits the failure line" do
+    it "returns 422 and hits the failure" do
         patch "/api/v1/reviews/#{review.id}", params: { review: { content: "" } }
         
         expect(response).to have_http_status(:unprocessable_content)

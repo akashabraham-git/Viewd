@@ -20,6 +20,11 @@ ActiveAdmin.register User do
     link_to "Restore User", restore_admin_user_path(resource), method: :put
   end
 
+  batch_action :delete_permanently, confirm: "This is irreversible. Purge these users?" do |ids|
+    User.with_deleted.where(id: ids).find_each(&:purge_entirely!)
+    redirect_to collection_path, notice: "Selected users have been wiped from the database."
+  end
+
   member_action :restore, method: :put do
     resource = User.with_deleted.find(params[:id])
     if resource.recover

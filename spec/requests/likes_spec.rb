@@ -164,16 +164,15 @@ RSpec.describe "Likes", type: :request do
     end
 
     describe "set_movie - Branch: @movie.nil? && params[:id].present?" do
-      context "when movie is found by id (nested FALSE: @movie exists after first find_by)" do
+      context "when movie is found by id " do
         it "sets @movie and skips the nested check" do
           post toggle_like_movie_review_path(movie, review), headers: @headers
           expect(assigns(:movie)).to eq(movie)
         end
       end
 
-      context "when movie is not found by id param and id is NOT present (branch FALSE)" do
+      context "when movie is not found by id param and id is NOT present" do
         it "handles when id param is missing" do
-          # This test is for the case where movie_id lookup fails but id isn't present
           post toggle_movie_like_movie_path(movie), headers: @headers
           expect(assigns(:movie)).to eq(movie)
         end
@@ -348,20 +347,16 @@ RSpec.describe "Likes", type: :request do
         allow(moderator_user).to receive(:actable).and_return(nil)
       end
 
-      it "handles nil member for movie like toggle (line 28 safe nav)" do
-        # When member is nil, find_by(member: nil) won't find anything
+      it "handles nil member for movie like toggle" do
         expect {
           post toggle_movie_like_movie_path(movie), headers: @headers
         }.not_to change(Like, :count)
       end
 
-      it "handles nil member for review like creation (line 33 else branch with nil)" do
-        # This tests the else branch where member is nil due to safe navigation
-        # create! with member: nil will fail or not create
+      it "handles nil member for review like creation " do
         begin
           post toggle_like_movie_review_path(movie, review), headers: @headers
         rescue ActiveRecord::InvalidRecord
-          # Expected when member is nil
         end
         expect(review.likes.count).to eq(0)
       end
@@ -395,29 +390,27 @@ RSpec.describe "Likes", type: :request do
     end
   end
 
-  describe "set_movie - Nested conditional branches (lines 48-49)" do
+  describe "set_movie - Nested conditional branches" do
     context "when first find_by returns nil AND id param exists AND second find_by returns nil" do
-      it "tries to get movie from Review.find_by returning nil (line 49 safe nav nil branch)" do
+      it "tries to get movie from Review.find_by returning nil " do
         post "/movies/999999/toggle_movie_like", headers: @headers
         expect(response).to redirect_to(movies_path)
         expect(flash[:alert]).to eq("Error: Movie not found.")
       end
     end
 
-    context "when first find_by fails but second find_by succeeds (line 48 nested FALSE branch)" do
+    context "when first find_by fails but second find_by succeeds " do
       it "finds movie by direct id lookup in second attempt" do
-        # Create a scenario where first lookup fails but we can still find by id
         post "/movies/#{movie.id}/toggle_movie_like", headers: @headers
         expect(assigns(:movie)).to eq(movie)
         expect(response).to redirect_to(movie_path(movie))
       end
     end
 
-    context "when Review.find_by returns a record but &.movie returns nil (line 49 safe nav chain)" do
+    context "when Review.find_by returns a record but &.movie returns nil " do
       let(:review_without_movie) { create(:review, movie: nil) }
 
       it "safely handles nil movie from review association" do
-        # This would test the &.movie returning nil
         post toggle_like_movie_review_path(movie, review), headers: @headers
         expect(assigns(:movie)).to eq(movie)
       end
@@ -427,17 +420,17 @@ RSpec.describe "Likes", type: :request do
   describe "Integration - Complete Workflows" do
     context "Member liking and unliking a movie" do
       it "completes full workflow: like -> unlike -> like" do
-        # Like
+        
         expect {
           post toggle_movie_like_movie_path(movie), headers: @headers
         }.to change(Like, :count).by(1)
 
-        # Unlike
+        
         expect {
           post toggle_movie_like_movie_path(movie), headers: @headers
         }.to change(Like, :count).by(-1)
 
-        # Like again
+        
         expect {
           post toggle_movie_like_movie_path(movie), headers: @headers
         }.to change(Like, :count).by(1)
@@ -448,17 +441,17 @@ RSpec.describe "Likes", type: :request do
 
     context "Member liking and unliking a review" do
       it "completes full workflow: like -> unlike -> like" do
-        # Like
+        
         expect {
           post toggle_like_movie_review_path(movie, review), headers: @headers
         }.to change(Like, :count).by(1)
 
-        # Unlike
+        
         expect {
           post toggle_like_movie_review_path(movie, review), headers: @headers
         }.to change(Like, :count).by(-1)
 
-        # Like again
+        
         expect {
           post toggle_like_movie_review_path(movie, review), headers: @headers
         }.to change(Like, :count).by(1)
@@ -533,7 +526,7 @@ RSpec.describe "Likes", type: :request do
     context "Invalid review" do
       it "redirects if review doesn't exist" do
         post "/movies/#{movie.id}/reviews/999999/toggle_like", headers: @headers
-        # The controller doesn't validate review existence
+       
         expect([302, 404, 500]).to include(response.status)
       end
     end
@@ -541,7 +534,7 @@ RSpec.describe "Likes", type: :request do
     context "Missing params" do
       it "handles invalid routes gracefully" do
         post "/movies/toggle_movie_like", headers: @headers
-        # Routes don't match, so we get 404
+       
         expect(response.status).to eq(404)
       end
     end

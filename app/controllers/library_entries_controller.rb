@@ -16,7 +16,12 @@ class LibraryEntriesController < ApplicationController
       if has_rating || has_review
         redirect_back fallback_location: movie_path(@movie), alert: "Can't be removed from your films since there's an activity in it."
       else
-        entry.update(watched_date: nil)
+        entry.watched_date = nil
+      if !entry.in_watchlist
+        entry.destroy_fully!
+      else
+        entry.save
+      end
         redirect_back fallback_location: movie_path(@movie)
       end
     end
@@ -26,6 +31,11 @@ class LibraryEntriesController < ApplicationController
     entry = LibraryEntry.find_or_initialize_by(member: @current_user.actable, movie: @movie)
     entry.in_watchlist = !entry.in_watchlist
     entry.save
+    if entry.watched_date.nil? && !entry.in_watchlist
+      entry.destroy unless entry.new_record?
+    else
+      entry.save
+    end
     redirect_back fallback_location: movie_path(@movie)
   end
 

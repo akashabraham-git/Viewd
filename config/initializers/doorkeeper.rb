@@ -32,7 +32,7 @@ end
     current_user || redirect_to(new_user_session)
   end
 
-  grant_flows %w[password client_credentials authorization_code]
+  grant_flows %w[password client_credentials authorization_code refresh_token]
 
   allow_blank_redirect_uri true
 

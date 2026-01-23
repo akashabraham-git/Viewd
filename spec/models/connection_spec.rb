@@ -16,7 +16,7 @@ RSpec.describe Connection, type: :model do
       
       expect(duplicate).not_to be_valid
       expect(duplicate.errors[:follower_id]).to include("connection already exists")
-    end
+    end 
   end
 
   describe "admin search configuration" do

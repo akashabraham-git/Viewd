@@ -47,7 +47,7 @@ RSpec.describe "Api::V1::Moderators", type: :request do
       end
     end
 
-    context "with invalid params (failure branch)" do
+    context "with invalid params " do
       it "returns 422 when update fails" do
         patch "/api/v1/moderators/#{mod_record.id}", params: { 
           moderator: { user_attributes: { id: mod_user.id, username: "" } } 

@@ -150,15 +150,14 @@ RSpec.describe "Api::V1::Movies", type: :request do
       it "returns error status", :aggregate_failures do
         sign_in_as(moderator_user)
         
-        allow_any_instance_of(Movie).to receive(:destroy).and_return(false)
-
-        errors_stub = double('errors', full_messages: ["Cannot delete this movie"])
-        allow_any_instance_of(Movie).to receive(:errors).and_return(errors_stub)
+        allow(Movie).to receive(:find).with(movie.id.to_s).and_return(movie)
+        allow(movie).to receive(:destroy).and_return(false)
+        allow(movie).to receive_message_chain(:errors, :full_messages).and_return(["Cannot delete this movie"])
 
         delete api_v1_movie_path(movie)
         
         expect(response).to have_http_status(:unprocessable_content)
-        expect(JSON.parse(response.body)["error"]).to eq("Cannot delete this movie")
+        expect(json_response["error"]).to eq("Cannot delete this movie")
       end
     end
   end
@@ -220,5 +219,11 @@ RSpec.describe "Api::V1::Movies", type: :request do
         expect(movie_ids).to include(movie_a.id)
       end
     end
+  end
+
+  private
+
+  def json_response
+    JSON.parse(response.body)
   end
 end

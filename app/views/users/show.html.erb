@@ -187,49 +187,52 @@
         </div>
 
         <%# STATISTICS PREVIEW FOR PRO/PATRON MEMBERS %>
-        <% membership = @user.actable&.membership %>
-        <% if membership&.active? && membership.membership_tier&.name&.in?(['Pro', 'Patron']) %>
-          <% stats = MemberStatisticsService.new(@user.actable).call %>
-          <div style="margin-top: 40px;">
-            <%= link_to statistics_path, style: "text-decoration: none; color: inherit;" do %>
-              <div style="border: 1px solid #00e054; padding: 12px; border-radius: 4px; cursor: pointer; transition: all 0.2s ease; background: #1a2129; hover: background: #2c3440;">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                  <h4 style="border-bottom: none; color: #fff; font-size: 0.7rem; margin: 0; padding-bottom: 0; text-transform: uppercase; letter-spacing: 0.5px;">📊 Your Stats</h4>
-                  <span style="background: #00e054; color: #000; padding: 2px 6px; border-radius: 3px; font-size: 0.6rem; font-weight: bold;">PRO</span>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
-                  <div style="background: #1a2129; padding: 6px; border-radius: 3px; border-left: 2px solid #00e054;">
-                    <p style="color: #678; font-size: 0.6rem; margin: 0; text-transform: uppercase; letter-spacing: 0.3px;">Films</p>
-                    <p style="color: #fff; font-size: 0.95rem; margin: 2px 0 0 0; font-weight: bold;"><%= stats[:total_films] %></p>
+        <% if @user.actable_type == "Member" && @user == @current_user %>
+        
+          <% membership = @user.actable&.membership %>
+          <% if membership&.active? && membership.membership_tier&.name&.in?(['Pro', 'Patron']) %>
+            <% stats = MemberStatisticsService.new(@user.actable).call %>
+            <div style="margin-top: 40px;">
+              <%= link_to statistics_path, style: "text-decoration: none; color: inherit;" do %>
+                <div style="border: 1px solid #00e054; padding: 12px; border-radius: 4px; cursor: pointer; transition: all 0.2s ease; background: #1a2129; hover: background: #2c3440;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <h4 style="border-bottom: none; color: #fff; font-size: 0.7rem; margin: 0; padding-bottom: 0; text-transform: uppercase; letter-spacing: 0.5px;">📊 Your Stats</h4>
+                    <span style="background: #00e054; color: #000; padding: 2px 6px; border-radius: 3px; font-size: 0.6rem; font-weight: bold;">PRO</span>
                   </div>
-                  <div style="background: #1a2129; padding: 6px; border-radius: 3px; border-left: 2px solid #00e054;">
-                    <p style="color: #678; font-size: 0.6rem; margin: 0; text-transform: uppercase; letter-spacing: 0.3px;">Hours</p>
-                    <p style="color: #fff; font-size: 0.95rem; margin: 2px 0 0 0; font-weight: bold;"><%= stats[:total_hours].round(0) %></p>
+                  
+                  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px;">
+                    <div style="background: #1a2129; padding: 6px; border-radius: 3px; border-left: 2px solid #00e054;">
+                      <p style="color: #678; font-size: 0.6rem; margin: 0; text-transform: uppercase; letter-spacing: 0.3px;">Films</p>
+                      <p style="color: #fff; font-size: 0.95rem; margin: 2px 0 0 0; font-weight: bold;"><%= stats[:total_films] %></p>
+                    </div>
+                    <div style="background: #1a2129; padding: 6px; border-radius: 3px; border-left: 2px solid #00e054;">
+                      <p style="color: #678; font-size: 0.6rem; margin: 0; text-transform: uppercase; letter-spacing: 0.3px;">Hours</p>
+                      <p style="color: #fff; font-size: 0.95rem; margin: 2px 0 0 0; font-weight: bold;"><%= stats[:total_hours].round(0) %></p>
+                    </div>
+                    <div style="background: #1a2129; padding: 6px; border-radius: 3px; border-left: 2px solid #00e054;">
+                      <p style="color: #678; font-size: 0.6rem; margin: 0; text-transform: uppercase; letter-spacing: 0.3px;">Avg ⭐</p>
+                      <p style="color: #fff; font-size: 0.95rem; margin: 2px 0 0 0; font-weight: bold;"><%= stats[:average_rating] %></p>
+                    </div>
+                    <div style="background: #1a2129; padding: 6px; border-radius: 3px; border-left: 2px solid #00e054;">
+                      <p style="color: #678; font-size: 0.6rem; margin: 0; text-transform: uppercase; letter-spacing: 0.3px;\">Reviews</p>
+                      <p style="color: #fff; font-size: 0.95rem; margin: 2px 0 0 0; font-weight: bold;\"><%= stats[:reviewed_films] %></p>
+                    </div>
                   </div>
-                  <div style="background: #1a2129; padding: 6px; border-radius: 3px; border-left: 2px solid #00e054;">
-                    <p style="color: #678; font-size: 0.6rem; margin: 0; text-transform: uppercase; letter-spacing: 0.3px;">Avg ⭐</p>
-                    <p style="color: #fff; font-size: 0.95rem; margin: 2px 0 0 0; font-weight: bold;"><%= stats[:average_rating] %></p>
-                  </div>
-                  <div style="background: #1a2129; padding: 6px; border-radius: 3px; border-left: 2px solid #00e054;">
-                    <p style="color: #678; font-size: 0.6rem; margin: 0; text-transform: uppercase; letter-spacing: 0.3px;\">Reviews</p>
-                    <p style="color: #fff; font-size: 0.95rem; margin: 2px 0 0 0; font-weight: bold;\"><%= stats[:reviewed_films] %></p>
-                  </div>
-                </div>
 
-                <% if stats[:genre_breakdown].any? %>
-                  <p style="color: #678; font-size: 0.6rem; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.3px;\">Top Genres</p>
-                  <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px;">
-                    <% stats[:genre_breakdown].first(2).each do |genre, _count| %>
-                      <span style="background: #00e054; color: #000; padding: 2px 6px; border-radius: 3px; font-size: 0.65rem; font-weight: bold;\"><%= genre %></span>
-                    <% end %>
-                  </div>
-                <% end %>
+                  <% if stats[:genre_breakdown].any? %>
+                    <p style="color: #678; font-size: 0.6rem; margin: 0 0 4px 0; text-transform: uppercase; letter-spacing: 0.3px;\">Top Genres</p>
+                    <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px;">
+                      <% stats[:genre_breakdown].first(2).each do |genre, _count| %>
+                        <span style="background: #00e054; color: #000; padding: 2px 6px; border-radius: 3px; font-size: 0.65rem; font-weight: bold;\"><%= genre %></span>
+                      <% end %>
+                    </div>
+                  <% end %>
 
-                <p style="color: #00e054; font-size: 0.65rem; margin: 6px 0 0 0; text-align: center; font-weight: bold;\">View Full Statistics →</p>
-              </div>
-            <% end %>
-          </div>
+                  <p style="color: #00e054; font-size: 0.65rem; margin: 6px 0 0 0; text-align: center; font-weight: bold;\">View Full Statistics →</p>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
         <% end %>
       </div>
     </div>

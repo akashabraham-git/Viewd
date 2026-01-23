@@ -34,8 +34,6 @@ class User < ApplicationRecord
     self.actable ||= Member.new if self.actable_type.nil? || self.actable_type == 'Member'
   end
 
-  # --- Devise / Authentication Overrides ---
-
   def self.authenticate(email, password)
     user = User.find_for_authentication(email: email)
     user&.valid_password?(password) ? user : nil
@@ -130,6 +128,28 @@ class User < ApplicationRecord
 
   def self.ransackable_associations(auth_object = nil)
     ["actable"]
+  end
+
+  def purge_entirely!
+    member_id = actable_id if actable_type == 'Member'
+    
+    conn = ActiveRecord::Base.connection
+
+    self.class.transaction do
+      if member_id
+        conn.execute("DELETE FROM memberships WHERE member_id = #{member_id}")
+        conn.execute("DELETE FROM active_storage_attachments WHERE record_id = #{member_id} AND record_type = 'Member'")
+        
+        ['likes', 'reviews', 'ratings', 'library_entries'].each do |table|
+          conn.execute("DELETE FROM #{table} WHERE member_id = #{member_id}")
+        end
+        conn.execute("DELETE FROM connections WHERE follower_id = #{member_id} OR following_id = #{member_id}")
+      end
+
+      conn.execute("DELETE FROM oauth_access_tokens WHERE resource_owner_id = #{id}")
+      conn.execute("DELETE FROM users WHERE id = #{id}")
+      conn.execute("DELETE FROM members WHERE id = #{member_id}") if member_id
+    end
   end
 
   private

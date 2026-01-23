@@ -9,7 +9,7 @@ class Rating < ApplicationRecord
   validates :member_id, uniqueness: { scope: :movie_id }
   validates :rating, presence: true, inclusion: { in: 1..5 }
 
-  after_create :mark_as_watched
+  after_save :mark_as_watched
 
   def mark_as_watched
     entry = LibraryEntry.find_or_initialize_by(member: member, movie: movie)

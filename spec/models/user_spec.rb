@@ -7,7 +7,6 @@ RSpec.describe User, type: :model do
 
   describe "Validations & Normalization" do
     it "normalizes email and username (covers normalize branches)" do
-      # Testing 'if present?' true and false branches
       u = build(:user, username: "  JOHN  ", email: "  JOHN@Test.Com  ", name: "  john doe  ")
       u.valid?
       expect(u.username).to eq("john")
@@ -15,7 +14,6 @@ RSpec.describe User, type: :model do
       u.save
       expect(u.name).to eq("John Doe")
 
-      # Testing 'if present?' else branches
       u2 = build(:user, username: nil, email: "test@test.com", name: nil)
       expect { u2.valid? }.not_to raise_error
       expect(u2.username).to be_nil
@@ -24,22 +22,18 @@ RSpec.describe User, type: :model do
 
   describe "Identity Management (actable)" do
     it "covers actable_attributes= branches" do
-      # True branch: Member
       user.actable_attributes = { bio: "Hello" }
       expect(user.actable.bio).to eq("Hello")
 
-      # False branch: Moderator (should ignore attributes)
       moderator.actable_attributes = { bio: "Hidden" }
       expect(moderator.actable).not_to respond_to(:bio)
     end
 
     it "covers build_member_identity branches" do
-      # True branch
       u = User.new(actable_type: nil)
       u.build_member_identity
       expect(u.actable).to be_a(Member)
 
-      # False branch
       moderator.build_member_identity
       expect(moderator.actable).to be_a(Moderator)
     end
@@ -114,23 +108,17 @@ RSpec.describe User, type: :model do
     end
 
     it "covers recover branches" do
-      # FALSE branch: user not deleted
       expect(user.recover).to be false
 
-      # FALSE branch: user deleted more than 1 year ago
       User.where(id: user.id).update_all(deleted_at: 2.years.ago)
       expect(user.reload.recover).to be false
 
-      # TRUE branch: user deleted within 1 year - should attempt recovery
       User.where(id: user.id).update_all(deleted_at: 1.month.ago)
       user.reload
       
-      # Check that recover attempts the recovery logic
-      # The method returns true when deleted_at > 1.year.ago
       if user.deleted_at.present? && user.deleted_at > 1.year.ago
         expect(user.recover).to be true
       else
-        # If recovery already happened, deleted_at would be nil
         expect(user.recover).to be false
       end
     end
@@ -142,82 +130,66 @@ RSpec.describe User, type: :model do
       expect(User.ransackable_associations).to include("actable")
     end
   end
+
   describe "Specific Branch Coverage Fixes" do
-    
-    
+    it "skips normalization when email is nil" do
+      user_with_nil = User.new(email: nil)
+      
+      expect { user_with_nil.valid? }.not_to raise_error
+      expect(user_with_nil.email).to be_nil
+    end
+  end
 
-    
+  describe "Branch Coverage Mastery" do
+    let(:user) { create(:user, :as_member) }
 
-    describe "line 152: normalize_email (nil email branch)" do
-      it "skips normalization when email is nil (line 152 else)" do
-        # We use 'build' and skip validations to ensure we hit the normalization 
-        # with a nil value without it crashing or being blocked by 'presence' validation
-        user_with_nil = User.new(email: nil)
-        
-        # Trigger the before_validation callback
-        expect { user_with_nil.valid? }.not_to raise_error
-        expect(user_with_nil.email).to be_nil
+    describe "#destroy branches" do
+      it "performs a hard delete for Moderators" do
+        mod = create(:user, :as_moderator)
+        mod_id = mod.id
+        mod.destroy
+        expect(User.unscoped.find_by(id: mod_id)).to be_nil
+      end
+
+      it "performs a soft delete for Members " do
+        user.destroy
+        expect(user.deleted_at).not_to be_nil
+        expect(User.with_deleted.find_by(id: user.id)).to be_present
       end
     end
 
+    describe "reset_password_by_token branches" do
+      it "handles an expired token " do
+        raw, enc = Devise.token_generator.generate(User, :reset_password_token)
+        user.update_columns(reset_password_token: enc, reset_password_sent_at: 24.hours.ago)
+
+        result = User.reset_password_by_token(reset_password_token: raw)
+        
+        expect(result.errors[:reset_password_token]).to be_present
+        expect(result.id).to eq(user.id) 
+      end
+
+      it "handles a nil/invalid token " do
+        result = User.reset_password_by_token(reset_password_token: "token-not-in-db")
+        
+        expect(result).to be_a_new(User)
+        expect(result.persisted?).to be false
+      end
+
+      it "skips recovery for non-deleted users" do
+        raw, enc = Devise.token_generator.generate(User, :reset_password_token)
+        user.update_columns(reset_password_token: enc, reset_password_sent_at: Time.now.utc)
+
+        expect(user).not_to receive(:recover)
+        User.reset_password_by_token(
+          reset_password_token: raw, 
+          password: "newpassword", 
+          password_confirmation: "newpassword"
+        )
+      end
+    end
   end
 
   
-
-  # spec/models/user_spec.rb
-
-describe "Branch Coverage Mastery" do
-  let(:user) { create(:user, :as_member) }
-
-  describe "#destroy branches" do
-    it "performs a hard delete for Moderators (True branch)" do
-      mod = create(:user, :as_moderator)
-      mod_id = mod.id
-      mod.destroy
-      expect(User.unscoped.find_by(id: mod_id)).to be_nil
-    end
-
-    it "performs a soft delete for Members (False branch)" do
-      user.destroy
-      expect(user.deleted_at).not_to be_nil
-      expect(User.with_deleted.find_by(id: user.id)).to be_present
-    end
-  end
-
-  describe ".reset_password_by_token branches" do
-    it "handles an expired token (Line 123 branch)" do
-      raw, enc = Devise.token_generator.generate(User, :reset_password_token)
-      # Force token to be expired
-      user.update_columns(reset_password_token: enc, reset_password_sent_at: 24.hours.ago)
-
-      result = User.reset_password_by_token(reset_password_token: raw)
-      
-      expect(result.errors[:reset_password_token]).to be_present
-      expect(result.id).to eq(user.id) # Must be the same user instance
-    end
-
-    it "handles a nil/invalid token (Line 124 branch)" do
-      # Provide a token that returns no user
-      result = User.reset_password_by_token(reset_password_token: "token-not-in-db")
-      
-      expect(result).to be_a_new(User)
-      expect(result.persisted?).to be false
-    end
-
-    it "skips recovery for non-deleted users (Implicit else on recovery line)" do
-      raw, enc = Devise.token_generator.generate(User, :reset_password_token)
-      user.update_columns(reset_password_token: enc, reset_password_sent_at: Time.now.utc)
-
-      # Resetting an active user should NOT trigger 'recover'
-      expect(user).not_to receive(:recover)
-      User.reset_password_by_token(
-        reset_password_token: raw, 
-        password: "newpassword", 
-        password_confirmation: "newpassword"
-      )
-    end
-  end
-end
-
   
 end

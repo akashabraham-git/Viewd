@@ -43,7 +43,7 @@ class ReviewsController < ApplicationController
     return_path = request.referer 
     deleted_review_url = review_path(@review)
 
-    if @review.destroy
+    if @review.destroy_fully!
       if return_path.include?(deleted_review_url)
         return_path = session.delete(:review_return_to) 
         redirect_to return_path, notice: "Review deleted."

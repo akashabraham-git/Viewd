@@ -18,7 +18,6 @@ RSpec.describe "Admin::Casts", type: :feature do
       visit admin_casts_path
       expect(page).to have_content("Leonardo DiCaprio")
       
-      # Filter logic
       visit admin_casts_path(q: { credits_job_eq: "Actor" })
       expect(page).to have_content("Leonardo DiCaprio")
     end

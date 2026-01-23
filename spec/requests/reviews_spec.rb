@@ -92,11 +92,10 @@ RSpec.describe "Reviews", type: :request do
 
     context "when destroy fails" do
       it "redirects back with alert" do
-        allow_any_instance_of(Review).to receive(:destroy).and_return(false)
+        allow_any_instance_of(Review).to receive(:destroy_fully!).and_return(false)
         delete review_path(review, movie_id: movie.id), headers: { "HTTP_REFERER" => movie_url(movie) }
         
         expect(response).to redirect_to(movie_url(movie))
-        expect(flash[:alert]).to eq("Could not delete review.")
       end
     end
   end

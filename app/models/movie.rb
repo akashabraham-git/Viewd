@@ -25,11 +25,11 @@ class Movie < ApplicationRecord
   end
 
   def self.recommended_for(member)
-        favorite_genre_ids = member.likes.where(likeable_type: 'Movie')
-                                  .joins("JOIN genres_movies ON likes.likeable_id = genres_movies.movie_id").pluck(:genre_id).uniq
+    favorite_genre_ids = member.likes.where(likeable_type: 'Movie')
+                              .joins("JOIN genres_movies ON likes.likeable_id = genres_movies.movie_id").pluck(:genre_id).uniq
 
-        released.recent.joins(:genres).where(genres: { id: favorite_genre_ids }).where.not(id: member.library_entries.pluck(:movie_id)).distinct
-      end
+    released.recent.joins(:genres).where(genres: { id: favorite_genre_ids }).where.not(id: member.library_entries.pluck(:movie_id)).distinct
+  end
 
   def self.ransackable_attributes(auth_object = nil)
     ["title", "status", "language", "release_date", "runtime", "tmdb_id", "created_at"]

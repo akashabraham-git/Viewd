@@ -35,6 +35,21 @@ RSpec.describe "LibraryEntries", type: :request do
         expect(entry.reload.watched_date).to be_nil
         expect(entry.in_watchlist).to be true
       end
+
+      it "destroys the entry if it's not in watchlist and has no activity" do
+        entry = LibraryEntry.create!(
+          member: member_record, 
+          movie: movie, 
+          watched_date: Date.yesterday, 
+          in_watchlist: false
+        )
+        
+        expect {
+          post "/movies/#{movie.id}/toggle_watched"
+        }.to change(LibraryEntry, :count).by(-1)
+        
+        expect(response).to redirect_to(movie_path(movie))
+      end
     end
   end
 
@@ -49,6 +64,22 @@ RSpec.describe "LibraryEntries", type: :request do
       post "/movies/#{movie.id}/toggle_watchlist"
       expect(entry.reload.in_watchlist).to be false
     end
+
+    it "destroys the entry if toggled to false and not watched" do
+      entry = LibraryEntry.create!(
+        member: member_record, 
+        movie: movie, 
+        watched_date: nil, 
+        in_watchlist: true
+      )
+
+      expect {
+        post "/movies/#{movie.id}/toggle_watchlist"
+      }.to change(LibraryEntry, :count).by(-1)
+      
+      expect(response).to redirect_to(movie_path(movie))
+    end
+  
   end
 
   describe "Movie Not Found" do
